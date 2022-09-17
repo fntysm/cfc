@@ -1,18 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX 2048
 
+void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
+    FILE *fH;
+    int lines = 0;
+    fH = fopen(fileName, "r");
+    if (fH == NULL){
+            printf("\nINEXISTANT FILE\n");
+            return;
+    };
+    while(!(feof(fH)) && (lines<=lineNum)){
+        lines++;
+        fgets(buffer, MAX, fH);
+    };
+    printf("the line number %d from the file %s's content:\n\n%s", lineNum, fileName, buffer);
+}
 int main()
 {
     printf("\twelcome to the file manipulation c program\n\n");
     printf("what do you want to do?\n\n1. read a specific line from a file\n2. delete a specific line from a file\n3. replace a specific line in a file\n4. find the largest number in a file\n5. reverse a file\n6. merge contents of 2 files in a third file\n7. quit\n");
     int choice;
+    FILE *fHandler;
+    int lineNumber;
     printf("please enter your choice: ");
     scanf("%d",&choice);
     switch(choice){
     case 1:
         {
             system("cls");
-            printf("you chose to read a specific line from a file");
+            char buffer[MAX];
+            char fileName[MAX/2];
+            printf("you chose to read a specific line from a file\n");
+            printf("enter the file's proper path: ");
+            scanf("%s", &fileName);
+            printf("\nenter the line number: ");
+            scanf("%d", &lineNumber);
+            readLine(fileName, lineNumber, buffer);
         }
         break;
     case 2:
@@ -53,8 +77,7 @@ int main()
         break;
     default:
         {
-            printf("\n\nthe value chosen to input is not included in the menu, try one more time: ");
-            scanf("%d", choice);
+            printf("\n\nthe value chosen to input is not included in the menu, try one more time");
         }
     }
 
