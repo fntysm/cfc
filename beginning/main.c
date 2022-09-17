@@ -15,6 +15,16 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
         fgets(buffer, MAX, fH);
     };
     printf("the line number %d from the file %s's content:\n\n%s", lineNum, fileName, buffer);
+    fclose(fH);
+}
+void deleteLine(char fileName[MAX/2], int lineNum){
+    FILE *fH;
+    fH = fopen(fileName, "a");
+    int lines = 0;
+    while(!(feof(fH)) && (lines<=lineNum)){
+        lines++;
+    };
+    fclose(fH);
 }
 int main()
 {
@@ -22,6 +32,7 @@ int main()
     printf("what do you want to do?\n\n1. read a specific line from a file\n2. delete a specific line from a file\n3. replace a specific line in a file\n4. find the largest number in a file\n5. reverse a file\n6. merge contents of 2 files in a third file\n7. quit\n");
     int choice;
     FILE *fHandler;
+    char fileName[MAX/2];
     int lineNumber;
     printf("please enter your choice: ");
     scanf("%d",&choice);
@@ -30,7 +41,6 @@ int main()
         {
             system("cls");
             char buffer[MAX];
-            char fileName[MAX/2];
             printf("you chose to read a specific line from a file\n");
             printf("enter the file's proper path: ");
             scanf("%s", &fileName);
@@ -43,6 +53,11 @@ int main()
         {
             system("cls");
             printf("you chose to delete a specific line from a file");
+            printf("enter the file's proper path: ");
+            scanf("%s", &fileName);
+            printf("\nenter the line number: ");
+            scanf("%d", &lineNumber);
+            deleteLine(fileName, lineNumber);
         }
         break;
     case 3:
