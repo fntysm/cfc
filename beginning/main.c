@@ -3,14 +3,63 @@
 
 int main()
 {
+    printf("\twelcome to the file manipulation c program\n\n");
+    printf("what do you want to do?\n\n1. read a specific line from a file\n2. delete a specific line from a file\n3. replace a specific line in a file\n4. find the largest number in a file\n5. reverse a file\n6. merge contents of 2 files in a third file\n7. quit\n");
+    int choice;
+    printf("please enter your choice: ");
+    scanf("%d",&choice);
+    switch(choice){
+    case 1:
+        {
+            system("cls");
+            printf("you chose to read a specific line from a file");
+        }
+        break;
+    case 2:
+        {
+            system("cls");
+            printf("you chose to delete a specific line from a file");
+        }
+        break;
+    case 3:
+        {
+            system("cls");
+            printf("you chose to replace a specific line in a file");
+        }
+        break;
+    case 4:
+        {
+            system("cls");
+            printf("you chose to find the largest number in a file");
+        }
+        break;
+    case 5:
+        {
+            system("cls");
+            printf("you chose to reverse a file");
+        }
+        break;
+    case 6:
+        {
+            system("cls");
+            printf("you chose to merge contents of 2 files in a third file");
+        }
+        break;
+    case 7:
+        {
+            system("cls");
+            printf("you chose to quit");
+        }
+        break;
+    default:
+        {
+            printf("\n\nthe value chosen to input is not included in the menu, try one more time: ");
+            scanf("%d", choice);
+        }
+    }
 
 }
 
-
-
-
-
-C:/Users/lenovo/cfc/.git/
 
 
 
@@ -72,3 +121,20 @@ fscanf( f, format, &var1, &var2, ... ) et fprintf( f, format, exp1, exp2, ... )
     fclose(fHandler1);
     fclose(fHandler2);
 */
+    /*FILE *fHandler;
+    fHandler = fopen("io.txt","w");
+    int time = 1;
+    fputs("a test\n",fHandler);
+    fprintf(fHandler,"this is a %d hit wonder\n", time);
+    fclose(fHandler);
+    FILE *fh;
+    fh = fopen("file.txt","r");
+    char read[15];
+    char buff[256];
+    // reading the file content as a straight string
+     fgets(buff,256,fh);
+    while (fscanf(fh,"%s",&read)!=-1){
+        printf("Buffer 01: %s\n",read);
+        printf("Buffer 02: %s\n",buff);
+    }
+    fclose(fh);*/
