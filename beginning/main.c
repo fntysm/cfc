@@ -21,15 +21,22 @@ FILE* deleteLine(char fileName[MAX/2], int lineNum){
     FILE *fH;
     FILE *fNew;
     char buffer[MAX];
-    fH = fopen(fileName, "a");
-    fNew = fopen("newone.txt","w");
+    char newFileName[MAX/2];
+    fH = fopen(fileName, "r");
+    if (fH == NULL){
+            printf("\nINEXISTANT FILE\n");
+            return;
+    };
+    strcpy(newFileName, "temp_");
+    strcat(newFileName,fileName);
+    fNew = fopen(newFileName,"w");
     int lines = 0;
     while(!(feof(fH))){
         if (lineNum != lines) {
                 fgets(buffer, MAX, fH);
                 fprintf(fNew,buffer,"\n");
-                lines++;
         };
+        lines++;
     };
     fclose(fH);
     return fNew;
@@ -42,13 +49,13 @@ int main()
     FILE *fHandler;
     char fileName[MAX/2];
     int lineNumber;
+    char buffer[MAX];
     printf("please enter your choice: ");
     scanf("%d",&choice);
     switch(choice){
     case 1:
         {
             system("cls");
-            char buffer[MAX];
             printf("you chose to read a specific line from a file\n");
             printf("enter the file's proper path: ");
             scanf("%s", &fileName);
@@ -66,6 +73,16 @@ int main()
             printf("\nenter the line number: ");
             scanf("%d", &lineNumber);
             fHandler=deleteLine(fileName, lineNumber);
+            printf("now we display the first file: ");
+            FILE* fh;
+            fh = fopen(fileName,"r");
+            while (fscanf(fh,"%s",&buffer)!=-1){
+                 printf("Buffer : %s\n",buffer);
+                                             }
+           /* printf("now we display the 2nd file: ");
+            while (fscanf(fHandler,"%s",&buffer)!=-1){
+                 printf("Buffer : %s\n",buffer);
+                                             }*/
         }
         break;
     case 3:
