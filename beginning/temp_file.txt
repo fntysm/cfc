@@ -1,6 +1,0 @@
-data
-browser
-random
-a line to delete;
-manipulation
-notion

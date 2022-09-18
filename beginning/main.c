@@ -32,13 +32,16 @@ FILE* deleteLine(char fileName[MAX/2], int lineNum){
     fNew = fopen(newFileName,"w");
     int lines = 0;
     while(!(feof(fH))){
+        fgets(buffer, MAX, fH);
         if (lineNum != lines) {
-                fgets(buffer, MAX, fH);
-                fprintf(fNew,buffer,"\n");
+                fputs(buffer, fNew);
         };
         lines++;
     };
     fclose(fH);
+    fclose(fNew);
+    remove(fileName);
+    rename(newFileName,fileName);
     return fNew;
 }
 int main()
@@ -72,17 +75,7 @@ int main()
             scanf("%s", &fileName);
             printf("\nenter the line number: ");
             scanf("%d", &lineNumber);
-            fHandler=deleteLine(fileName, lineNumber);
-            printf("now we display the first file: ");
-            FILE* fh;
-            fh = fopen(fileName,"r");
-            while (fscanf(fh,"%s",&buffer)!=-1){
-                 printf("Buffer : %s\n",buffer);
-                                             }
-           /* printf("now we display the 2nd file: ");
-            while (fscanf(fHandler,"%s",&buffer)!=-1){
-                 printf("Buffer : %s\n",buffer);
-                                             }*/
+            fHandler = deleteLine(fileName, lineNumber);
         }
         break;
     case 3:
