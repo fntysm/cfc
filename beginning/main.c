@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define MAX 2048
 
 void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
@@ -44,6 +45,24 @@ FILE* deleteLine(char fileName[MAX/2], int lineNum){
     rename(newFileName,fileName);
     return fNew;
 }
+void replaceLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
+    FILE *fH;
+    char content[MAX];
+    int lines = 0;
+    fH = fopen(fileName, "r");
+    if (fH == NULL){
+            printf("\nINEXISTANT FILE\n");
+            return;
+    };
+    while(!(feof(fH)) && (lines<=lineNum)){
+        lines++;
+        fgets(content, MAX, fH);
+        if(lines==lineNum){
+            fputs(buffer, fH);
+        }
+    };
+    fclose(fH);
+}
 int main()
 {
     printf("\twelcome to the file manipulation c program\n\n");
@@ -82,6 +101,13 @@ int main()
         {
             system("cls");
             printf("you chose to replace a specific line in a file");
+            printf("enter the file's proper path: ");
+            scanf("%s", &fileName);
+            printf("\nenter the line number: ");
+            scanf("%d", &lineNumber);
+            printf("\ninput the replacement text: ");
+            scanf("%s", &buffer);
+            replaceLine(fileName, lineNumber, buffer);
         }
         break;
     case 4:
