@@ -46,22 +46,35 @@ FILE* deleteLine(char fileName[MAX/2], int lineNum){
     return fNew;
 }
 void replaceLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
-    FILE *fH;
+    FILE *fH, *temp;
     char content[MAX];
     int lines = 0;
+    char newFileName[MAX/2];
     fH = fopen(fileName, "r");
+    strcpy(newFileName, "temp_");
+    strcat(newFileName,fileName);
+    temp = fopen(newFileName, "w");
     if (fH == NULL){
             printf("\nINEXISTANT FILE\n");
             return;
     };
-    while(!(feof(fH)) && (lines<=lineNum)){
-        lines++;
+    printf("\ninput the replacement text: ");
+    scanf("%s", &buffer);
+    fflush(stdin);
+    fgets(buffer,MAX,stdin);
+    while(!(feof(fH))){
         fgets(content, MAX, fH);
         if(lines==lineNum){
-            fputs(buffer, fH);
+            fputs(buffer, temp);
+        }else{
+            fputs(content, temp);
         }
+        lines++;
     };
     fclose(fH);
+    fclose(temp);
+   /* remove(fileName);
+    rename(newFileName,fileName);*/
 }
 int main()
 {
@@ -105,8 +118,6 @@ int main()
             scanf("%s", &fileName);
             printf("\nenter the line number: ");
             scanf("%d", &lineNumber);
-            printf("\ninput the replacement text: ");
-            scanf("%s", &buffer);
             replaceLine(fileName, lineNumber, buffer);
         }
         break;

@@ -1,5 +1,6 @@
 data
 browser
-random
 manipulation
 notion
+a string of words
+epilogue
