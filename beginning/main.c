@@ -17,14 +17,22 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     printf("the line number %d from the file %s's content:\n\n%s", lineNum, fileName, buffer);
     fclose(fH);
 }
-void deleteLine(char fileName[MAX/2], int lineNum){
+FILE* deleteLine(char fileName[MAX/2], int lineNum){
     FILE *fH;
+    FILE *fNew;
+    char buffer[MAX];
     fH = fopen(fileName, "a");
+    fNew = fopen("newone.txt","w");
     int lines = 0;
-    while(!(feof(fH)) && (lines<=lineNum)){
-        lines++;
+    while(!(feof(fH))){
+        if (lineNum != lines) {
+                fgets(buffer, MAX, fH);
+                fprintf(fNew,buffer,"\n");
+                lines++;
+        };
     };
     fclose(fH);
+    return fNew;
 }
 int main()
 {
@@ -57,7 +65,7 @@ int main()
             scanf("%s", &fileName);
             printf("\nenter the line number: ");
             scanf("%d", &lineNumber);
-            deleteLine(fileName, lineNumber);
+            fHandler=deleteLine(fileName, lineNumber);
         }
         break;
     case 3:
@@ -95,7 +103,7 @@ int main()
             printf("\n\nthe value chosen to input is not included in the menu, try one more time");
         }
     }
-
+    return 0;
 }
 
 
