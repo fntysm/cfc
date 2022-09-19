@@ -113,19 +113,27 @@ void reverseFile(char fileName[MAX/2]){
     char content[MAX];
     fHandler=fopen(fileName,"r");
     fRev=fopen("temp.txt","w");
-    if (fh == NULL){
+    if (fHandler == NULL){
         printf("\nINEXISTANT FILE\n");
         return;
     };
-    while(!(feof(fHandler))){
-        fgets(content, MAX, fH);
-        fputs(content,fRev);
-
+    /**deplace the pointer to the end of the file**/
+    fseek(fHandler, 0, SEEK_END);
+    /**the length of the file**/
+    int length=ftell(fHandler);
+    /**coming back one char at a time**/
+    fseek(fHandler,-1,SEEK_CUR);
+    while(length>0){
+        char c=fgetc(fHandler);
+        fputc(c,fRev);
+        printf("%c",c);
+        fseek(fHandler,-2,SEEK_CUR);
+        length--;
     }
     fclose(fHandler);
     fclose(fRev);
-    remove(fHandler);
-    rename("temp.txt",fileName);
+   /* remove(fHandler);
+    rename("temp.txt",fileName);*/
 }
 int main()
 {
@@ -188,6 +196,7 @@ int main()
             printf("you chose to reverse a file");
             printf("enter the file's proper path: ");
             scanf("%s", &fileName);
+            reverseFile(fileName);
         }
         break;
     case 6:
