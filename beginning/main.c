@@ -79,14 +79,34 @@ void replaceLine(char fileName[MAX/2], int lineNum){
     remove(fileName);
     rename(newFileName,fileName);
 }
-void findLargest(char fileName[MAX/2]){
+double findLargest(char fileName[MAX/2]){
     FILE *fh;
-    float Largest;
+    double current, Largest;
+    char content[MAX];
+    int n=0;
     fh=fopen(fileName,"r");
+    if (fh == NULL){
+        printf("\nINEXISTANT FILE\n");
+        return;
+    };
     while(!(feof(fh))){
-        fscanf(fh,"%lf",Largest);
-        printf("this is what is stored: %.3f",Largest);
+         n++;
+         fscanf(fh, "%[^\n]", content);
+         current = atof(content);
+         fprintf(fh,"\n");
+         if(n==1){
+            Largest=current;
+         }
+         else{
+            if (current>Largest){
+                Largest=current;
+            }
+         }
+
     }
+    printf("\nTHE LARGEST NUMBER IN THIS FILE IS: %lf", Largest);
+    return Largest;
+    fclose(fh);
 }
 int main()
 {
@@ -136,10 +156,11 @@ int main()
     case 4:
         {
             system("cls");
+            double L;
             printf("you chose to find the largest number in a file");
             printf("enter the file's proper path: ");
             scanf("%s", &fileName);
-            findLargest(fileName);
+            L=findLargest(fileName);
         }
         break;
     case 5:
