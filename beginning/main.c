@@ -108,6 +108,25 @@ double findLargest(char fileName[MAX/2]){
     return Largest;
     fclose(fh);
 }
+void reverseFile(char fileName[MAX/2]){
+    FILE *fHandler, *fRev;
+    char content[MAX];
+    fHandler=fopen(fileName,"r");
+    fRev=fopen("temp.txt","w");
+    if (fh == NULL){
+        printf("\nINEXISTANT FILE\n");
+        return;
+    };
+    while(!(feof(fHandler))){
+        fgets(content, MAX, fH);
+        fputs(content,fRev);
+
+    }
+    fclose(fHandler);
+    fclose(fRev);
+    remove(fHandler);
+    rename("temp.txt",fileName);
+}
 int main()
 {
     printf("\twelcome to the file manipulation c program\n\n");
@@ -167,6 +186,8 @@ int main()
         {
             system("cls");
             printf("you chose to reverse a file");
+            printf("enter the file's proper path: ");
+            scanf("%s", &fileName);
         }
         break;
     case 6:
