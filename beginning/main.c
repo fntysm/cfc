@@ -132,8 +132,26 @@ void reverseFile(char fileName[MAX/2]){
     }
     fclose(fHandler);
     fclose(fRev);
-   /* remove(fHandler);
-    rename("temp.txt",fileName);*/
+    remove(fHandler);
+    rename("temp.txt",fileName);
+}
+FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
+    FILE* fileH1;
+    FILE* fileH2;
+    FILE* fileH3;
+    fileH1 = fopen(file1,"r");
+    fileH2 = fopen(file2,"r");
+    if((fileH1==NULL)||(fileH2==NULL)){
+        printf("INEXISTANT FILE(S)");
+        return;
+    }
+    strcat(file1,file2);
+    char file3[MAX/2];
+    strcpy(file3,"new_");
+    strcat(file3,file1);
+    printf("\nthe name of the new file: %s\n", file3);
+    fileH3 = fopen(file3,"w");
+    return fileH3;
 }
 int main()
 {
@@ -202,7 +220,13 @@ int main()
     case 6:
         {
             system("cls");
+            char fileName2[MAX/2];
             printf("you chose to merge contents of 2 files in a third file");
+            printf("\n\nenter the FIRST file's proper path: ");
+            scanf("%s", &fileName);
+            printf("\n\nenter the SECOND file's proper path: ");
+            scanf("%s", &fileName2);
+            fHandler = merge2files(fileName,fileName2);
         }
         break;
     case 7:
