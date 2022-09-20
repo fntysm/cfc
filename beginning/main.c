@@ -139,6 +139,7 @@ FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
     FILE* fileH1;
     FILE* fileH2;
     FILE* fileH3;
+    char c;
     fileH1 = fopen(file1,"r");
     fileH2 = fopen(file2,"r");
     if((fileH1==NULL)||(fileH2==NULL)){
@@ -149,8 +150,17 @@ FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
     char file3[MAX/2];
     strcpy(file3,"new_");
     strcat(file3,file1);
-    printf("\nthe name of the new file: %s\n", file3);
     fileH3 = fopen(file3,"w");
+    while(feof(fileH1)!=EOF){
+        c=fgetc(fileH1);
+        fputc(c,fileH3);
+    }
+    fprintf(fileH3,"\n");
+    while(feof(fileH2)!=EOF){
+        c=fgetc(fileH2);
+        fprintf(fileH2,"\n");
+        fputc(c,fileH3);
+    }
     return fileH3;
 }
 int main()
