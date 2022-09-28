@@ -14,9 +14,11 @@ void lireFichier(){
         printf("\nINEXISTANT FILE\n");
     }
     while(!(feof(file))){
+        printf("here is one\n\n");
         fgets(buffer, MAX,file);
         printf("%s", buffer);
     }
+    fclose(file);
     printf("\n\n");
 }
 /**Donner un programme C qui concatène 2 fichiers textes.**/
@@ -46,9 +48,47 @@ FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
         fprintf(fileH2,"\n");
         fputc(c,fileH3);
     }
+    fclose(fileH1);
+    fclose(fileH2);
+    fclose(fileH3);
     return fileH3;
+}
+/**Donner un programme C qui compte le nombre d'occurrence d'un mot donné dans un fichier texte.**/
+int nbOcc(char mot[MAX]){
+    FILE *file;
+    char fichier[MAX/2];
+    char buffer[MAX]="";
+    char c;
+    int e;
+    int i=0;
+    printf("\nentrer le nom du fichier: ");
+    scanf("%s",&fichier);
+    file = fopen(fichier,"r");
+    if(file==NULL){
+        printf("\nINEXISTANT FILE\n");
+        return -1;
+    }
+    while(!(feof(file))){
+        c=fgetc(file);
+        printf("%c",c);
+        printf("\nwe before the stncat\n");
+        strncat(buffer, c, 1);
+        printf("\nwe after the stncat\n");
+        if(strcmp(buffer,mot)==0){
+            printf("\nwe've entered here\n");
+            i++;
+        }
+    }
+    fclose(file);
+    return i;
 }
 int main()
 {
+    int d;
+    char mot[MAX];
+    printf("\n\nentrer le mot recherche: ");
+    scanf("%s",&mot);
+    d=nbOcc(mot);
+    printf("\n\nthe value of i : %d",d);
     return 0;
 }
