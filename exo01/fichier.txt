@@ -1,4 +1,4 @@
-l'école nationale supérieure de l'informatique
+l'ecole nationale superieure de l'informatique a oued semmar
 2022/2023
 module: SFSD
 se familiariser avec l'API standard de manipulation de fichiers de la libC
