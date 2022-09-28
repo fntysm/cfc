@@ -83,6 +83,7 @@ int nbOcc(char mot[MAX]){
     fclose(file);
     return i;
 }
+/**Ecrire un programme C qui calcul le nombre de lignes dans un fichier texte.**/
 int calculLignes(){
     FILE *file;
     char fichier[MAX/2];
@@ -102,8 +103,36 @@ int calculLignes(){
     printf("le nombre de lignes: %d", i);
     return i;
 }
+/**crypter un fichier avec une clé secrète (un mot donné)**/
+void cryptageFich(){
+    FILE *file1, *file2;
+    char *fichier1, *fichier2;
+    int n; /**n la taille de la clé**/
+    int choice;
+    printf("\nquelle type de fichier voulez vous crypter: \n0 pour un fichier binaire\n1 pour un fichier texte\n");
+    scanf("%d",&choice);
+    printf("Nom du fichier : ");
+    scanf(" %s", &fichier1);
+    printf("Nom du fichier crypted: ");
+    scanf(" %s", &fichier2);
+    switch(choice){
+        case 0:{
+            file1=fopen(fichier1,"rb");
+            file2=fopen(fichier2,"wb");
+            fclose(fichier1);
+            fclose(fichier2);
+        }
+        break;
+        case 1:{
+            file1=fopen(fichier1,"r");
+            file2=fopen(fichier2,"w");
+            fclose(fichier1);
+            fclose(fichier2);
+        }
+        break;
+    }
+}
 int main()
 {
-    calculLignes();
     return 0;
 }
