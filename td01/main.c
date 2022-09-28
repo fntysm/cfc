@@ -83,9 +83,27 @@ int nbOcc(char mot[MAX]){
     fclose(file);
     return i;
 }
+int calculLignes(){
+    FILE *file;
+    char fichier[MAX/2];
+    char buffer[MAX];
+    int i=0;
+    printf("\nentrer le nom du fichier: ");
+    scanf("%s",&fichier);
+    file = fopen(fichier,"r");
+    if(file==NULL){
+        printf("\nINEXISTANT FILE\n");
+    }
+    while(!feof(file)){
+        fgets(buffer, MAX,file);
+        i++;
+    }
+    fclose(file);
+    printf("le nombre de lignes: %d", i);
+    return i;
+}
 int main()
 {
-    int d;
-    char mot[MAX];
+    calculLignes();
     return 0;
 }
