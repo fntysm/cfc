@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX 2048
+/**déclaration de la structure d'enregistrement: exercice 6**/
+struct weather{
+    char ville[50];
+    char date[10];
+    float temperature;
+}enreg;
 /**Donner un programme C qui affiche le contenu d'un fichier texte à l'écran.**/
 void lireFichier(){
     FILE *file;
@@ -109,6 +115,7 @@ void cryptageFich(){
     char *fichier1, *fichier2;
     int n; /**n la taille de la clé**/
     int choice;
+    char ligne[MAX];
     printf("\nquelle type de fichier voulez vous crypter: \n0 pour un fichier binaire\n1 pour un fichier texte\n");
     scanf("%d",&choice);
     printf("Nom du fichier : ");
@@ -134,11 +141,61 @@ void cryptageFich(){
                 printf("\n\nFICHIER INEXISTANT\n\n");
                 return 1;
             }
+            while(!(feof(fichier1))){
+                if(fgets(ligne, sizeof(ligne), fichier1)){
+                        return -5;
+                }
+            }
             fclose(fichier1);
             fclose(fichier2);
         }
         break;
     }
+}
+
+int creerunfichierbinaireexo6()
+{
+     struct Tenreg {
+         char ville[50]; char date[50];
+         float temperateur;
+         }e;
+
+FILE *f;
+ char nomf[30];
+printf("\nConstruction d'un fichier agenda telephonique\n\n");
+printf("Donnez le nom du fichier à construire : ");
+scanf(" %s", nomf);
+f = fopen( nomf, "wb" );
+if ( f == NULL )
+{
+printf("erreur lors de l'ouverture du fichier %s en mode wb\n", nomf);
+return 0;
+}
+ printf("donnez une ville et une date et une temperateur (ou 0 0 0 pour terminer le programme) : ");
+    scanf(" %s %s %f", e.ville,e.date,&e.temperateur);
+
+      while ( e.ville[0] != '0' )
+        {   fwrite(&e, sizeof(e), 1, f);
+ printf("donnez une ville et une date et une temperateur (ou 0 0 0 pour terminer le programme): ");
+    scanf(" %s %s %f", e.ville, e.date,&e.temperateur);    }
+
+return 0;
+
+}
+/**manipulation d'un fichier binaire contenant les mesures de températures effectuées sur différentes villes
+à différentes dates.**/
+void exo6(){
+    FILE* fH;
+    char fichier[MAX/2];
+    printf("\n\nDonner le nom du fichier: ");
+    scanf("%s",fichier);
+    fH = fopen(fichier,"rb");
+    if(fH==NULL){
+        printf("\nINEXISTANT FILE\n");
+        return;
+    }
+
+    fclose(fH);
 }
 int main()
 {
