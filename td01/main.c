@@ -119,6 +119,10 @@ void cryptageFich(){
         case 0:{
             file1=fopen(fichier1,"rb");
             file2=fopen(fichier2,"wb");
+            if((file1==NULL)||(file2==NULL)){
+                printf("\n\nFICHIER INEXISTANT\n\n");
+                return 1;
+            }
             fclose(fichier1);
             fclose(fichier2);
         }
@@ -126,6 +130,10 @@ void cryptageFich(){
         case 1:{
             file1=fopen(fichier1,"r");
             file2=fopen(fichier2,"w");
+            if((file1==NULL)||(file2==NULL)){
+                printf("\n\nFICHIER INEXISTANT\n\n");
+                return 1;
+            }
             fclose(fichier1);
             fclose(fichier2);
         }
