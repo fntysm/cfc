@@ -141,11 +141,11 @@ void cryptageFich(){
                 printf("\n\nFICHIER INEXISTANT\n\n");
                 return 1;
             }
-            while(!(feof(fichier1))){
+          /**  while(!(feof(fichier1))){
                 if(fgets(ligne, sizeof(ligne), fichier1)){
-                        return -5;
-                }
+                        return;
             }
+            }**/
             fclose(fichier1);
             fclose(fichier2);
         }
@@ -155,32 +155,26 @@ void cryptageFich(){
 
 int creerunfichierbinaireexo6()
 {
-     struct Tenreg {
-         char ville[50]; char date[50];
-         float temperateur;
-         }e;
+    FILE *f;
+    char nomf[30];
+    printf("Donnez le nom du fichier à construire : ");
+    scanf(" %s", nomf);
+    f = fopen( nomf, "wb" );
+    if ( f == NULL )
+       {
+       printf("INEXISTANT FILE\n");
+       return 0;
+       }
+    printf("donnez une ville, sa date et sa temperature : ");
+    scanf("%s %s %f", enreg.ville,enreg.date,&enreg.temperature);
 
-FILE *f;
- char nomf[30];
-printf("\nConstruction d'un fichier agenda telephonique\n\n");
-printf("Donnez le nom du fichier à construire : ");
-scanf(" %s", nomf);
-f = fopen( nomf, "wb" );
-if ( f == NULL )
-{
-printf("erreur lors de l'ouverture du fichier %s en mode wb\n", nomf);
-return 0;
-}
- printf("donnez une ville et une date et une temperateur (ou 0 0 0 pour terminer le programme) : ");
-    scanf(" %s %s %f", e.ville,e.date,&e.temperateur);
-
-      while ( e.ville[0] != '0' )
-        {   fwrite(&e, sizeof(e), 1, f);
- printf("donnez une ville et une date et une temperateur (ou 0 0 0 pour terminer le programme): ");
-    scanf(" %s %s %f", e.ville, e.date,&e.temperateur);    }
-
-return 0;
-
+    while ( enreg.ville[0] != '0' )
+    {
+       fwrite(&e, sizeof(e), 1, f);
+       printf("donnez une ville, sa date et sa temperature : ");
+       scanf(" %s %s %f", enreg.ville, enreg.date,&enreg.temperature);
+    }
+    return 0;
 }
 /**manipulation d'un fichier binaire contenant les mesures de températures effectuées sur différentes villes
 à différentes dates.**/
