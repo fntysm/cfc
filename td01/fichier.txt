@@ -1,4 +1,5 @@
-l'ecole nationale superieure de l'informatique a oued semmar et oued
-2022/2023 oued
-module: SFSD
-oued se familiariser avec l'API standard de manipulation de fichiers de la libC 
+l'ecole nationale superieure de l'informatique a oued semmar 
+2022/2023 /esi/////
+module: SFSD esi
+esi se familiariser avec l'API standard de manipulation de fichiers "esi" de la libC 
+esi;

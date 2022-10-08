@@ -3,38 +3,43 @@
 #include <string.h>
 #define MAX 2048
 /**déclaration de la structure d'enregistrement: exercice 6**/
-struct weather{
+struct champs{
     char ville[50];
     char date[10];
     float temperature;
 }enreg;
 /**Donner un programme C qui affiche le contenu d'un fichier texte à l'écran.**/
-void lireFichier(){
-    FILE *file;
-    char fichier[MAX/2];
+void lireFichier(char fichier[MAX/2]){
+    FILE* file;
     char buffer[MAX];
-    printf("\nentrer le nom du fichier: ");
-    scanf("%s",&fichier);
     printf("\nle contenu du fichier: \n\n");
     file = fopen(fichier,"r");
     if(file==NULL){
         printf("\nINEXISTANT FILE\n");
+        return;
     }
     while(!(feof(file))){
-        printf("here is one\n\n");
         fgets(buffer, MAX,file);
         printf("%s", buffer);
     }
+    //une autre solution: c=fgetc(file)!=EOF
     fclose(file);
     printf("\n\n");
+    return;
 }
 /**Donner un programme C qui concatène 2 fichiers textes.**/
-FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
+FILE* merge2files(){
     FILE* fileH1;
     FILE* fileH2;
     FILE* fileH3;
+    char file1[MAX/2];
+    char file2[MAX/2];
     char file3[MAX/2];
     char c;
+    printf("\nentrer le nom du 1er fichier: ");
+    scanf("%s",&file1);
+    printf("\nentrer le nom du 2eme fichier: ");
+    scanf("%s",&file2);
     fileH1 = fopen(file1,"r");
     fileH2 = fopen(file2,"r");
     if((fileH1==NULL)||(fileH2==NULL)){
@@ -45,15 +50,18 @@ FILE* merge2files(char file1[MAX/2], char file2[MAX/2]){
     strcpy(file3,"new_");
     strcat(file3,file1);
     fileH3 = fopen(file3,"w");
-    while(feof(fileH1)!=EOF){
+    while(!(feof(fileH1))){
         c=fgetc(fileH1);
-        fputc(c,fileH3);
+        if(c!=EOF){
+           fputc(c,fileH3);
+        }
     }
     fprintf(fileH3,"\n");
-    while(feof(fileH2)!=EOF){
+    while(!(feof(fileH2))){
         c=fgetc(fileH2);
-        fprintf(fileH2,"\n");
-        fputc(c,fileH3);
+        if(c!=EOF){
+           fputc(c,fileH3);
+        }
     }
     fclose(fileH1);
     fclose(fileH2);
@@ -67,7 +75,7 @@ int nbOcc(char mot[MAX]){
     char fichier[MAX/2];
     char buffer[MAX];
     int i=0;
-    char *motgot;
+    char *tokens;
     printf("\nentrer le nom du fichier: ");
     scanf("%s",&fichier);
     file = fopen(fichier,"r");
@@ -76,15 +84,14 @@ int nbOcc(char mot[MAX]){
         return -1;
     }
     while(!(feof(file))){
-            fgets(buffer, MAX,file);
-            motgot = strtok(buffer,limits);
-            while(motgot!=NULL){
-                if(strcmp(motgot,mot)==0){
+            fgets(buffer, sizeof(buffer),file);
+            tokens = strtok(buffer,limits);
+            while(tokens!=NULL){
+                if(strcmp(tokens,mot)==0){
                     i++;
                 }
-                 motgot = strtok(NULL, limits);
+            tokens = strtok(NULL, limits);
             }
-            motgot = strtok(NULL, limits);
         }
     fclose(file);
     return i;
@@ -170,7 +177,7 @@ int creerunfichierbinaireexo6()
 
     while ( enreg.ville[0] != '0' )
     {
-       fwrite(&e, sizeof(e), 1, f);
+       fwrite(&enreg, sizeof(enreg), 1, f);
        printf("donnez une ville, sa date et sa temperature : ");
        scanf(" %s %s %f", enreg.ville, enreg.date,&enreg.temperature);
     }
@@ -188,10 +195,12 @@ void exo6(){
         printf("\nINEXISTANT FILE\n");
         return;
     }
-
     fclose(fH);
 }
 int main()
 {
+    int i;
+    i = nbOcc("esi");
+    printf("nombre d'occurences: %d",i);
     return 0;
 }

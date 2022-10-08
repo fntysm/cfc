@@ -330,3 +330,5 @@ fscanf( f, format, &var1, &var2, ... ) et fprintf( f, format, exp1, exp2, ... )
         printf("Buffer 02: %s\n",buff);
     }
     fclose(fh);*/
+
+fsync // fflush
