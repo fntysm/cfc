@@ -4,8 +4,8 @@
 #define MAX 2048
 /**déclaration de la structure d'enregistrement: exercice 6**/
 struct champs{
-    char ville[50];
-    char date[10];
+    char ville[11];
+    char date[6];
     float temperature;
 }enreg;
 /**Donner un programme C qui affiche le contenu d'un fichier texte à l'écran.**/
@@ -159,27 +159,60 @@ void cryptageFich(){
         break;
     }
 }
-
-int creerunfichierbinaireexo6()
+void textfilecrypted(char* key){
+    int n; // la taille de la clé
+    n = strlen(key);
+    FILE* fH;
+    char* fichier;
+    char* buffer;
+    printf("\nveuillez entrer le nom du fichier a crypter: ");
+    scanf("%s",&fichier);
+    fH = fopen(fichier,"a+");
+    if(fH==NULL){
+        printf("\nINEXISTANT FILE\n");
+        return;
+    }
+    while(!(feof(fH))){
+        fgets(buffer,sizeof(buffer),fH);
+        fseek(fH,0,SEEK_CUR);
+        fputs(key,fH);
+    }
+    fclose(fH);
+}
+int addstructs()
 {
     FILE *f;
     char nomf[30];
-    printf("Donnez le nom du fichier à construire : ");
-    scanf(" %s", nomf);
-    f = fopen( nomf, "wb" );
+    int choice;
+    printf("cliquer 0 pour construire et 1 pour ajouter a un fichier existant: ");
+    scanf("%d",&choice);
+    switch(choice){
+        case 0:{
+            printf("\nDonnez le nom du fichier a construire : ");
+            scanf("%s", nomf);
+            f = fopen( nomf, "wb" );
+        }
+            break;
+        case 1:{
+            printf("\nDonnez le nom du fichier pour lui rajouter un nouveau enregistrement : ");
+            scanf("%s", nomf);
+            f = fopen( nomf, "ab" );
+        }
+            break;
+    }
     if ( f == NULL )
        {
        printf("INEXISTANT FILE\n");
        return 0;
        }
-    printf("donnez une ville, sa date et sa temperature : ");
+    printf("\n\ndonnez une ville, sa date et sa temperature : ");
     scanf("%s %s %f", enreg.ville,enreg.date,&enreg.temperature);
 
     while ( enreg.ville[0] != '0' )
     {
        fwrite(&enreg, sizeof(enreg), 1, f);
-       printf("donnez une ville, sa date et sa temperature : ");
-       scanf(" %s %s %f", enreg.ville, enreg.date,&enreg.temperature);
+       printf("\n\ndonnez une ville, sa date et sa temperature : ");
+       scanf("%s %s %f", &enreg.ville, &enreg.date,&enreg.temperature);
     }
     return 0;
 }
@@ -187,20 +220,31 @@ int creerunfichierbinaireexo6()
 à différentes dates.**/
 void exo6(){
     FILE* fH;
-    char fichier[MAX/2];
+    char *fichier, *buffer;
+    int choice;
     printf("\n\nDonner le nom du fichier: ");
-    scanf("%s",fichier);
-    fH = fopen(fichier,"rb");
-    if(fH==NULL){
-        printf("\nINEXISTANT FILE\n");
-        return;
+    scanf("%s",&fichier);
+    printf("\nQue ce que vous voulez faire?\n1- connaitre la temperature minimale, maximale et moyenne pour une ville donnee \n2- modifier la temperature d'une ville donnee a une date donnee\n3- supprimer tous les enregistrements relatifs a une ville donnee ");
+    printf("\nchoisir l'operation que vous souhaitez appliquer: ");
+    scanf("%d",&choice);
+    switch(choice){
+        case 1:{
+            printf("\nvous avez choisi de connaitre la temperature minimale, maximale et moyenne pour une ville donnee");
+        }break;
+        case 2:{
+            printf("\nvous avez choisi de modifier la temperature d'une ville donnee a une date donnee");
+        }break;
+        case 3:{
+            fread(buffer,sizeof(enreg),,F);
+            printf("\nvous avez choisi de supprimer tous les enregistrements relatifs a une ville donnee");
+        }break;
     }
+    // fread(buffer,taille_elt,nbr_elt,F);
     fclose(fH);
+    return;
 }
 int main()
 {
-    int i;
-    i = nbOcc("esi");
-    printf("nombre d'occurences: %d",i);
+    exo6();
     return 0;
 }
