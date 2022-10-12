@@ -1,0 +1,8 @@
+while(fscanf(f,"%s %s %d",e.ville,e.date,e.temp)==3) // M=10
+ i++;
+ if(i==M)
+   fwrite(buf,sizeof(e),M,f)
+   i=0
+ else
+   fwrite(buf,sizeof(e),i,f)
+ 
