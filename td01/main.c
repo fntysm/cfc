@@ -219,32 +219,96 @@ int addstructs()
 /**manipulation d'un fichier binaire contenant les mesures de températures effectuées sur différentes villes
 à différentes dates.**/
 void exo6(){
-    FILE* fH;
     char *fichier, *buffer;
     int choice;
     printf("\n\nDonner le nom du fichier: ");
     scanf("%s",&fichier);
+    FILE* FH=fopen("fichieraca.bin","rb");
+    if(FH==NULL){
+       printf("INEXISTANT FILE");
+       return;
+    }
     printf("\nQue ce que vous voulez faire?\n1- connaitre la temperature minimale, maximale et moyenne pour une ville donnee \n2- modifier la temperature d'une ville donnee a une date donnee\n3- supprimer tous les enregistrements relatifs a une ville donnee ");
     printf("\nchoisir l'operation que vous souhaitez appliquer: ");
     scanf("%d",&choice);
     switch(choice){
         case 1:{
             printf("\nvous avez choisi de connaitre la temperature minimale, maximale et moyenne pour une ville donnee");
+            char* ville;
+            int max=60;
+            int min=60;
+            int n,prem,moy,k;
+            prem = 0;
+            n = 0;
+            moy = 0;
+            k = 0;
+            printf("Donnez la ville: ");
+            scanf("%s",&ville);
+            while(!feof(FH)){
+                    n=fread(&enreg,sizeof(enreg),1,FH);
+                    if(n!=0){
+                       if(strcmp(enreg.ville,ville)==0){
+                         if(prem){
+                            max=enreg.temperature;
+                            min=enreg.temperature;
+                            prem=0;
+                                 }
+                         else{
+                          if(enreg.temperature>max){
+                             max=enreg.temperature;
+                            }
+                          else{
+                            if(enreg.temperature<min){
+                             min = enreg.temperature;
+                              }
+                              }
+                             }
+                   moy+=enreg.temperature;
+                   k++;
+                     }
+                   }
+                          }
+             moy /= k;
         }break;
         case 2:{
+            float newTemp, temp;
+            char * ville;
             printf("\nvous avez choisi de modifier la temperature d'une ville donnee a une date donnee");
+            struct champs data;
+            printf("Donnez la ville: ");
+            scanf("%s",&ville);
+            printf("La temperature: ");
+            scanf("%f",&temp);
+            printf("Donnez la temperature: ");
+            scanf("%f",&newTemp);
+         /*   while(fread(&data,sizeof(enreg),1,FH)==1){
+                if((!(strcmp(data.ville,ville)))&&(!(strcmp(data.temperature,temp)))){
+                    data.temperature = newTemp;
+                    fseek(F,sizeof(enreg),SEEK_CUR);
+                    fwrite(data,sizeof(enreg),1,FH);
+                }
+            }*/
         }break;
         case 3:{
-            fread(buffer,sizeof(enreg),,F);
+//      fread(buffer,sizeof(enreg),F);
             printf("\nvous avez choisi de supprimer tous les enregistrements relatifs a une ville donnee");
+            FILE* f=fopen("newfich.bin","wb");
+            while(fread(&enreg,sizeof(enreg),1,f)){
+                if(strcmp(enreg.ville,ville)!=0){
+                    fwrite(enreg,sizeof(enreg),1,f);
+                }
+            remove(fH);
+            rename("newfich.bin",fichier);
+            }
         }break;
     }
     // fread(buffer,taille_elt,nbr_elt,F);
-    fclose(fH);
+    fclose(FH);
     return;
 }
 int main()
 {
-    exo6();
+
+
     return 0;
 }
