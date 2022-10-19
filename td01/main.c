@@ -44,7 +44,7 @@ FILE* merge2files(){
     fileH2 = fopen(file2,"r");
     if((fileH1==NULL)||(fileH2==NULL)){
         printf("INEXISTANT FILE(S)");
-        return;
+        return fileH1;
     }
     strcat(file1,file2);
     strcpy(file3,"new_");
@@ -219,16 +219,19 @@ int addstructs()
 /**manipulation d'un fichier binaire contenant les mesures de températures effectuées sur différentes villes
 à différentes dates.**/
 void exo6(){
-    char *fichier, *buffer;
+    char fichier[MAX/2];
+    char *buffer;
     int choice;
+    FILE* FH;
     printf("\n\nDonner le nom du fichier: ");
-    scanf("%s",&fichier);
-    FILE* FH=fopen("fichieraca.bin","rb");
+    scanf("%s", &fichier);
+    FH = fopen(fichier,"rb");
     if(FH==NULL){
        printf("INEXISTANT FILE");
        return;
     }
-    printf("\nQue ce que vous voulez faire?\n1- connaitre la temperature minimale, maximale et moyenne pour une ville donnee \n2- modifier la temperature d'une ville donnee a une date donnee\n3- supprimer tous les enregistrements relatifs a une ville donnee ");
+    printf("\nQue ce que vous voulez faire?\n1- connaitre la temperature minimale, maximale et moyenne pour une ville donnee \n");
+    printf("2- modifier la temperature d'une ville donnee a une date donnee\n3- supprimer tous les enregistrements d'une ville");
     printf("\nchoisir l'operation que vous souhaitez appliquer: ");
     scanf("%d",&choice);
     switch(choice){
@@ -242,16 +245,21 @@ void exo6(){
             n = 0;
             moy = 0;
             k = 0;
-            printf("Donnez la ville: ");
+            printf("\nDonnez la ville: ");
             scanf("%s",&ville);
             while(!feof(FH)){
                     n=fread(&enreg,sizeof(enreg),1,FH);
                     if(n!=0){
+                       printf("K: %d", k);
+                       printf("\nMOYENNE: %d",moy);
+                       printf("\nTEMPERATURE MINIMALE: %d ",min);
+                       printf("\nTEMPERATURE MAXIMALE: %d",max);
                        if(strcmp(enreg.ville,ville)==0){
-                         if(prem){
+                        printf("\npremiere strcmp reach");
+                         if(!(prem)){
                             max=enreg.temperature;
                             min=enreg.temperature;
-                            prem=0;
+                            prem=1;
                                  }
                          else{
                           if(enreg.temperature>max){
@@ -269,6 +277,9 @@ void exo6(){
                    }
                           }
              moy /= k;
+             printf("MOYENNE: %d",moy);
+             printf("TEMPERATURE MINIMALE: %d",min);
+             printf("TEMPERATURE MAXIMALE: %d",max);
         }break;
         case 2:{
             float newTemp, temp;
@@ -309,6 +320,6 @@ void exo6(){
 }
 int main()
 {
-    addstructs();
+    exo6();
     return 0;
 }
