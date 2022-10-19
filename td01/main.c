@@ -291,13 +291,14 @@ void exo6(){
         }break;
         case 3:{
 //      fread(buffer,sizeof(enreg),F);
+            char * ville;
             printf("\nvous avez choisi de supprimer tous les enregistrements relatifs a une ville donnee");
             FILE* f=fopen("newfich.bin","wb");
             while(fread(&enreg,sizeof(enreg),1,f)){
                 if(strcmp(enreg.ville,ville)!=0){
-                    fwrite(enreg,sizeof(enreg),1,f);
+                    fwrite(&enreg,sizeof(enreg),1,f);
                 }
-            remove(fH);
+            remove(FH);
             rename("newfich.bin",fichier);
             }
         }break;
@@ -308,7 +309,6 @@ void exo6(){
 }
 int main()
 {
-
-
+    addstructs();
     return 0;
 }
