@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #define MAX 23
 #define b 4 // maximum d'enreg
-struct enreg{
+typedef struct enreg{
     int key;
     char info[MAX]; // type qlq
 }Tenreg;
-struct bloc{
+typedef struct bloc{
     Tenreg Tab[b];
     int nb;
 }Tbloc;
@@ -26,8 +26,15 @@ int main()
         scanf("%d %s",&e.key,&e.info);
         if(j<b){
             buffer.Tab[j]=e;
-
+            j++;
+        }else{
+            buffer.nb = j
         }
+        ecriredir(f,i,buf);
+        j=0;
+        i++;
+        buffer.tab[0]=e;
+
     }
     return 0;
 }
