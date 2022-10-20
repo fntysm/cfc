@@ -250,12 +250,8 @@ void exo6(){
             while(!feof(FH)){
                     n=fread(&enreg,sizeof(enreg),1,FH);
                     if(n!=0){
-                       printf("K: %d", k);
-                       printf("\nMOYENNE: %d",moy);
-                       printf("\nTEMPERATURE MINIMALE: %d ",min);
-                       printf("\nTEMPERATURE MAXIMALE: %d",max);
                        if(strcmp(enreg.ville,ville)==0){
-                        printf("\npremiere strcmp reach");
+                           printf("premier search strcmp");
                          if(!(prem)){
                             max=enreg.temperature;
                             min=enreg.temperature;
@@ -277,9 +273,6 @@ void exo6(){
                    }
                           }
              moy /= k;
-             printf("MOYENNE: %d",moy);
-             printf("TEMPERATURE MINIMALE: %d",min);
-             printf("TEMPERATURE MAXIMALE: %d",max);
         }break;
         case 2:{
             float newTemp, temp;
