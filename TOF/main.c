@@ -29,12 +29,17 @@ int main()
             j++;
         }else{
             buffer.nb = j
+            ecriredir(f,i,buf);
+            j=0;
+            i++;
+            buffer.tab[0]=e;
+            j++;
         }
-        ecriredir(f,i,buf);
-        j=0;
-        i++;
-        buffer.tab[0]=e;
-
     }
+    buffer.nb = j;
+    ecriredir(f,i,buffer);
+    affentete(f,1,i);
+    affentete(f,2,n);
+    fclose(fh);
     return 0;
 }
