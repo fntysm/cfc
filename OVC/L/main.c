@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define b 100
 /**déclarations des structures**/
 typedef struct un_bloc{
@@ -194,9 +195,9 @@ void recuperer_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],Tbloc
 }
 
 //----------------------------------- // procedure qui permet d'ecrire n caractère du buffer----------------------------------------------//
-void ecrire_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],int *cpt,Tbloc *buf)
+void ecrire_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],Tbloc *buf)
 {
-
+    int *cpt;
     int k=0;
     (*cpt)=0;     // nombre de bloc ajoutés
     for(k=0;k<n;k++)   // k pourn le deplacement dans la chaine
@@ -220,6 +221,92 @@ void ecrire_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],int *cpt
 
 }
 
+/**fonctions de base**/
+void recherche_LnOVC(LnOVC *fichier,int cle,int trouv,int i, int j){
+    Tbloc *buf;
+    char *longueur, *efface, *clef;
+    i = Fentete(fichier,1);
+    j=0;
+    trouv = 0;
+    LireDir(fichier,i,buf);
+    while((!(trouv)&&(i!=Fentete(fichier,2)))||((i==Fentete(fichier,2))&&(j<Fentete(fichier,3)))){
+        recuperer_chaine(fichier,3,i,j,longueur,buf);
+        recuperer_chaine(fichier,1,i,j,efface,buf);
+        recuperer_chaine(fichier,20,i,j,clef,buf);
+        if((strcmp(cle,clef)==0)&&(efface="N")){
+            trouv = 1;
+        }else{
+            j = j + atoi(longueur) - 20 ;
+            if(j>b){
+                j = j - b;
+                i = buf->next;
+                LireDir(fichier,i,buf);
+            }
+        }
+    }
+}
+void insertion_LnOVC(LnOVC *fichier,int cle,char *enreg){
+    int i,j, trouv;
+    int chaine_longueur;
+    Tbloc *buf;
+    recherche_LnOVC(fichier,cle,trouv,i,j);
+    if(trouv==1){
+        printf("insertion impossible");
+        return;
+    }else{
+        i=Fentete(fichier,2);
+        j=Fentete(fichier,3);
+        chaine_longueur = strlen(enreg);
+        ecrire_chaine(fichier,3,chaine_longueur,i,j,buf);
+        ecrire_chaine(fichier,1,"N",i,j,buf);
+        ecrire_chaine(fichier,strlen(enreg),enreg,i,j,buf);
+        buf->next = -1;
+        ecriredir(fichier,i,buf);
+        if(i!=Fentete(fichier,2)){
+            aff_entete(fichier,2,i);
+        }
+        aff_entete(fichier,3,j);
+    }
+    fermer(fichier);
+}
+int nb_pos(int a)
+{
+    int cpt=1;
+    while((a/10)!=0)
+    {
+        a=a/10 ;
+        cpt++ ;
+    }
+   return(cpt);
+}
+int cle_correct(int cle)
+{
+  int  correct=0 ;
+  if(nb_pos(cle)>5)
+
+  {
+      puts("cle n'est pas correct") ;
+  }
+  return(correct) ;
+
+}
+void creation_fichier(LnOVC *fichier,int n) // procedure de création du ficher
+{
+    int k=0,cle;
+    char *info=malloc(sizeof(char)*50);
+    aff_entete(fichier,1,1);
+    for(k=0;k<n;k++)
+    {
+        printf("\tveuillez introduire la cle que vous voulez inserer\n");
+        scanf("%d",&cle);
+        printf("\t veuillez introduire l'info que vous voulez inserer\n\n");
+        scanf("%s",info);
+        if(cle_correct(cle))
+           {
+            insertion_LnOVC(fichier,cle,info);
+           }
+    }
+}
 int main()
 {
     printf("Hello world!\n");
