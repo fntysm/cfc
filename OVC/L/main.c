@@ -91,9 +91,8 @@ void ecriredir(LnOVC *fichier, int i, buffer *buf)
 }
 LnOVC *ouvrir(char nomf[], char mode)
 {
-
     LnOVC *fichier=malloc(sizeof(LnOVC)); // allocation  de la structure
-    Tbloc *buf;
+    Tbloc buf;
     if( (mode=='A') ||  (mode == 'a') )   // mode ancien
     {
         fichier->fh=fopen(nomf,"rb+"); // ouverture du fichier en mode binaire lecture et ecriture
@@ -110,7 +109,7 @@ LnOVC *ouvrir(char nomf[], char mode)
              aff_entete(fichier,4,0);  // aucun caractère n'a encore été supprimé
              fwrite(&(fichier->enteTe),sizeof(entete),1,fichier->fh);// enregistrement de l'entete dans le fichier
              buf.next=-1;   // le suivant du premier bloc a NIL
-             sprintf(buf.tab,"%s","");  // initialisation du buffer a chaine vide
+             sprintf(buf.Tab,"%s","");  // initialisation du buffer a chaine vide
              ecriredir(fichier,1,&buf); // ecriture du premier bloc dans le fichier
 
 
@@ -131,6 +130,96 @@ void fermer(LnOVC *fichier)  // procedure de fermeture du fichier
     fclose(fichier->fh);// fermeture du fichier
 
 }
+void alloc_bloc(LnOVC *fichier)
+{
+
+        Tbloc *buf=malloc(sizeof(Tbloc));       // allocation du Buffer
+        LireDir(fichier,Fentete(fichier,3),buf);   // lecture du bloc correspondant a la queue
+        buf->next=Fentete(fichier,1)+1;         // mise a jour dui suvant de la queue au bloc correspondant a la nouvelle queue
+        ecriredir(fichier,Fentete(fichier,3),buf);// ecriture du bloc de queue dans le fichier
+        aff_entete(fichier,3,Fentete(fichier,1)+1);// mise a jour du numero du bloc correspondant a la nouvelle queue dan sl'entete
+        buf->next=-1;                         // mise a jour du suivant a nill
+        sprintf(buf->Tab,"%s","");               // vider la chaine du buffer
+        ecriredir(fichier,Fentete(fichier,3),buf);// ecriture du buffer dans le bloc representatnt la nouvelle queue
+        aff_entete(fichier,1,Fentete(fichier,1)+1);// incrémentation du nombre de bloc alloués
+}
+
+// transformer un nombre en chaine de caractère sur longueur de caractère//
+void turn_to_string(char chaine[], int n, int longueur)
+{
+
+    int k;
+    for(k=longueur-1;k>=0;k--)          // on commence par le poids faible du nombre qui va etre mi a chaine[longueur-1]
+    {
+        chaine[k]=(n%10)+'0';           // extraction chiffre par chiffre  grace au mod par 10 et ajout du code ascii du zero afoin d'obtenir le code ascii correspondant au chiffre obtenu
+        n=n/10;                        // on passe au chiffre suivant
+    }
+    chaine[longueur]='\0';             // fin de la chaine construite
+}
+
+//fonction qui permet de construire la chaine correspondant a la forme de l'enregistrememnt//
+void concat(char chaine[], int cle, char info[])  //           a inserer dans le ficheir a partir de la cle et de l'info
+{
+
+    char ch_f[100];
+    turn_to_string(ch_f,cle,5);                   // transformation de la cle en chaine sur 5 positions
+    strcat(ch_f,info);                            // concaténation de cle et info
+    turn_to_string(chaine,strlen(info),3);        // construction du debut de la chaine finale en commençant par la taille de l'info
+    strcat(chaine,"f");                           // mise a jour du champs effacé
+    strcat(chaine,ch_f);                          // constructu=ion de la chaine finale avec l'ordre suivant taille efface cle info
+}
+//----------------------------------- fonction qui permet de récuperer une chaine de longueur
+ // n dans le bloc i  lu dans buffer a partir de la position j-------------//
+void recuperer_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],Tbloc *buf) //
+   {
+
+    int k=0;
+    sprintf(chaine,"%s","");
+    for(k=0;k<n;k++)                    // boucle de n itérations correspondant a la longueur de la chaine
+    {                                   // indice de parcours de la chaine resultata et j celui du tableau
+        if((*j)<=98)                    // si le kièmem caractère de la chaine correspondant au j ime car du buffer  est toujour dans le bloc i
+        {                               // le caractère 99 correspond a la fin de la chaine dans le tableau
+            chaine[k]=buf->Tab[(*j)];   // recuperation du caractère dans la position k de la chaine
+            (*j)++;                      // deplacement d'une position dans le buffer
+        }
+        else                             // si le k ièeme caractère a recuperer sort du buffer
+        {
+            (*i)=buf->next;           // on passe au suivant du bloc i dans la liste
+            LireDir(fichier,(*i),buf);   // lecture
+            chaine[k]=buf->Tab[0];       // recuperation du premier caractère du tableau de carractère correspondant au ka ième car de la chaine
+            (*j)=1;                      //positionnement eu second caractère dans le nouveau buffer
+        }
+    }
+   chaine[k]='\0';                        // fin de la chaine obtenue
+}
+
+//----------------------------------- // procedure qui permet d'ecrire n caractère du buffer----------------------------------------------//
+void ecrire_chaine(LnOVC *fichier,int n , int *i, int *j, char chaine[],int *cpt,Tbloc *buf)
+{
+
+    int k=0;
+    (*cpt)=0;     // nombre de bloc ajoutés
+    for(k=0;k<n;k++)   // k pourn le deplacement dans la chaine
+    {
+        if((*j)<=98)  //si je suis toujours dans le bloc conserné
+        {
+            buf->Tab[*j]=chaine[k]; // affectation des caractères de la chaine dans le buffer un a un
+            (*j)++;                  // deplacement da,s le buffer
+        }
+        else                          // si la chaine a inserer depasse le buffer
+         {
+            ecriredir(fichier,*i,buf);  // ecriture du precedent buffer dans le fichier
+            alloc_bloc(fichier);        // alocation d'un nouveau bloc afin de recevoir le reste de la chaine
+            buf->Tab[0]=chaine[k];      // ecrtiture du kiem caractère de la chaine dans la position 0
+            (*j)=1;                     // passage a la position 1
+            (*i)=Fentete(fichier,3);     // deplacement dans les bloc du ficher
+            (*cpt)++;                   // incrementation du nombre de bloc alloues
+        }
+    }
+    buf->Tab[*j]='\0';                  // fin de la chaine
+
+}
+
 int main()
 {
     printf("Hello world!\n");
