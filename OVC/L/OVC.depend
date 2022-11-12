@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1668265474 source:e:\2cp\sfsd\cfc\ovc\l\main.c
+1668280305 source:e:\2cp\sfsd\cfc\ovc\l\main.c
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 

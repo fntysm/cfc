@@ -290,6 +290,7 @@ int cle_correct(int cle)
   return(correct) ;
 
 }
+
 void creation_fichier(LnOVC *fichier,int n) // procedure de création du ficher
 {
     int k=0,cle;
@@ -297,6 +298,7 @@ void creation_fichier(LnOVC *fichier,int n) // procedure de création du ficher
     aff_entete(fichier,1,1);
     for(k=0;k<n;k++)
     {
+        printf("\n\n");
         printf("\tveuillez introduire la cle que vous voulez inserer\n");
         scanf("%d",&cle);
         printf("\t veuillez introduire l'info que vous voulez inserer\n\n");
@@ -308,7 +310,9 @@ void creation_fichier(LnOVC *fichier,int n) // procedure de création du ficher
     }
 }
 int main()
-{
-    printf("Hello world!\n");
+{   LnOVC *fh;
+    fh = ouvrir("fichier1.bin",'n');
+    creation_fichier(fh,3);
+    fermer(fh);
     return 0;
 }
