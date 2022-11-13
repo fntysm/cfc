@@ -305,6 +305,7 @@ void creation_fichier(LnOVC *fichier,int n) // procedure de création du ficher
         scanf("%s",info);
         if(cle_correct(cle))
            {
+            //
             insertion_LnOVC(fichier,cle,info);
            }
     }
