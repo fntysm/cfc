@@ -1,0 +1,46 @@
+first read of the task: 
+
+- machine abstraite des TOVC obligée
+- TOVC ordonné hiérarchiquement selon le numéro correspondant à la classe et le nom et
+prénom de l’élève.
+- accès accéléré par index
+- enregistrements des élèves d'une école primaire
+- chaque élève: 
+* Un numéro d’identification unique composé de 4 caractères
+* Un numéro identifiant la classe, composé de :
+           * L’année de scolarisation sur un caractère (un numéro 1 2 3 4 5 et P pour année préparative)
+           * Le numéro de la salle (séquentiel par année ou séquentiel pour toute l’école).
+* Le nom et prénom de taille variable.
+* Le genre sur un caractère. F ou M
+* Un tableau des notes de matières selon l’ordre alphabétique correspondant à l’année.
+
+functions to be built: 
+I/
+1- la machine abstraite et pour créer le fichier (ouvrir(fich,'N'))
+
+  a. Générer aléatoirement le numéro d’identification de l’élève et l’identifiant de la classe.
+
+  b. Générer aléatoirement deux nombres pour 6 années* 100. Faites correspondre ces
+  deux nombres aux noms figurant dans deux fichiers textes de noms prénoms algériens
+  et genre, séparés par des virgules, que vous devez construire. Ces derniers sont
+  chargés en MC pour le traitement.
+
+  c. Une suite de notes selon l’année correspondant aux matières, de chaque année,
+  récupérées à partir d’un fichier texte
+
+2- fonction d'insertion d'élève
+3- fonction de suppression
+4- fonction mise à jour
+
+II/
+Le fichier précédent représente l’année en cours. Chaque année est marquée par l’archivage
+des résultats des élèves.
+
+un fichier de dossiers scolaires par
+élève comprenant les années de scolarisation par élève et la moyenne de passage.
+just a silly proposition:
+la clé: l'année de scolarisation
+le modèle: TOF
+
+un index basé sur les moyennes adapté à la recherche par intervalle
+
