@@ -109,9 +109,10 @@ int alloc_bloc(TOVC *pF)
     return entete(pF,1);
 }
 TOVC chargement_initial(){
+     TOVC fh;
      int i; // nbr d'enreg
-     char *anneeString;
-     char *salleString;
+     char anneeString[2];
+     char salleString[2];
      Enreg e;
      srand(time(0));
      // on veut une aléa entre 0 et 5
@@ -126,17 +127,13 @@ TOVC chargement_initial(){
             int salle = rand() % 21;
             int annee = rand() % 6;
             printf("\n%d\n",salle);
-            manipulerLaCle(salle,annee,salleString,anneeString);
+            sprintf(salleString,"%d", salle);
          //  strcat(anneeString,salleString);
            // printf("%s", anneeString);
+            printf("on a ca %s", salleString);
 
      }
-
-}
-void manipulerLaCle(int salle, int annee, char *stringSalle, char *stringAnnee){
-    printf("on a entrer ici");
-    sprintf(stringSalle,"%d", salle);
-    printf("on a ca %s", stringSalle);
+     return fh;
 }
 int main()
 {
