@@ -6,6 +6,7 @@
 #define Max_enreg 20
 #define b 3
 #define MatMax 15
+#define MAX 50
 
 /**déclaration des structures**/
 typedef struct Tbloc
@@ -18,10 +19,11 @@ typedef struct Tbloc Buffer;
 typedef struct TEnreg
 {
     int numID; // 4 caractères
-    int anneeScol; // L’année de scolarisation 5/P sur un caractère
-    int classeID[1];// et numéro de salle
-    char * NomPrenom;
-    char genre[1];
+    // int anneeScol; , L’année de scolarisation 5/P sur un caractère
+    // int classeID[1]; et numéro de salle
+    char * classID;
+    char NomPrenom[50];
+    char genre;
     int tabNotes[MatMax];
 }   Enreg;
 
@@ -108,36 +110,76 @@ int alloc_bloc(TOVC *pF)
     aff_entete(pF,1,entete(pF,1)+1);
     return entete(pF,1);
 }
-TOVC chargement_initial(){
-     TOVC fh;
+// read a specific line from a file
+void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
+    FILE *fH;
+    int lines = 0;
+    fH = fopen(fileName, "r");
+    if (fH == NULL){
+            printf("\nINEXISTANT FILE\n");
+            return;
+    };
+    while(!(feof(fH)) && (lines<=lineNum)){
+        lines++;
+        fscanf(fH, "%s", buffer);
+        //fgets(buffer, MAX, fH);
+    };
+    fclose(fH);
+}
+void chargement_initial(int n, TOVC fh){
      int i; // nbr d'enreg
-     char anneeString[2];
+     char classID[3];
+     char anneeString[3];
      char salleString[2];
+     char genre, c;
+     char noms[50];
+     char prenoms[50];
      Enreg e;
      srand(time(0));
-     // on veut une aléa entre 0 et 5
-     int n1 = rand() % 6;
-     int n2 = rand() % 4;
      // pour construire le tableau des notes
      int note = rand() % 10;
-     for(i=0;i<5;i++){
+     int classeID;
+     for(i=0;i<n;i++){
+            printf("\n\ni = %d\n",i);
             // Générer aléatoirement le numéro d’identification de l’élève.
             int studentID = rand() % 10000;
             // on va concaténér annee et salle
-            int salle = rand() % 21;
-            int annee = rand() % 6;
-            printf("\n%d\n",salle);
+            int salle = rand() % 10;
+            int annee = 1 + rand() % 6; // if annee == 6 donc on parle de l'année préparatoire
             sprintf(salleString,"%d", salle);
-         //  strcat(anneeString,salleString);
-           // printf("%s", anneeString);
-            printf("on a ca %s", salleString);
+            printf("\n%s",salleString);
+            sprintf(anneeString,"%d", annee);
+            printf("\n%s",anneeString);
+            strcat(anneeString,salleString);
+            strcpy(classID,anneeString);
+            classeID = atoi(classID);
+            if(classeID / 60 == 1){
+                classID[0] = 'P';
+            }
+            printf("\nclass id: %s\n\n", classID);
+            // pour choisir les lignes dans les 2 fichiers;
+            int n1 = rand() % 8;
+            int n2 = rand() % 8;
+            readLine("noms.txt",n1,noms);
+            readLine("prenoms.txt",n2,prenoms);
+            printf("\non a n1 : %d et sa ligne: %s et on a termine\n",n1,noms);
+            printf("\non a n2 : %d et sa ligne: %s et on a termine et on a le sexe %c\n",n2,prenoms,prenoms[0]);
+            e.numID = studentID;
+            e.classID = classID;
+            e.genre = prenoms[0];
+            strcpy(e.NomPrenom,noms);
+            for(i=0;i<strlen(prenoms);i++){
+                prenoms[i]=prenoms[i+1];
+            }
+            printf("\n\non a le prenom dka: %s",prenoms);
+            strcat(e.NomPrenom,prenoms);
+            printf("\ngenre: %c and name %s",e.genre,e.NomPrenom);
 
      }
-     return fh;
 }
 int main()
 {
     TOVC fh;
-    fh = chargement_initial();
+    chargement_initial(7,fh);
     return 0;
 }

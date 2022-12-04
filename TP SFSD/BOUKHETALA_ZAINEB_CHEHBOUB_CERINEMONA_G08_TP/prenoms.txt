@@ -1,4 +1,8 @@
-cerine,F
-yanis,M
-mohamed,M
-zedzed,F
+Fcerine
+Myanis
+Mmohamed
+Fzedzed
+Fhaifouf
+Fmari
+Mkamal
+Mmalae
