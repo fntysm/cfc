@@ -128,12 +128,14 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
 }
 void chargement_initial(int n, TOVC fh){
      int i; // nbr d'enreg
+     int n1,n2;
      char classID[3];
      char anneeString[3];
      char salleString[2];
      char genre, c;
      char noms[50];
      char prenoms[50];
+     int studentID, salle, annee;
      Enreg e;
      srand(time(0));
      // pour construire le tableau des notes
@@ -142,10 +144,10 @@ void chargement_initial(int n, TOVC fh){
      for(i=0;i<n;i++){
             printf("\n\ni = %d\n",i);
             // Générer aléatoirement le numéro d’identification de l’élève.
-            int studentID = rand() % 10000;
+            studentID = rand() % 10000;
             // on va concaténér annee et salle
-            int salle = rand() % 10;
-            int annee = 1 + rand() % 6; // if annee == 6 donc on parle de l'année préparatoire
+            salle = rand() % 10;
+            annee = 1 + rand() % 6; // if annee == 6 donc on parle de l'année préparatoire
             sprintf(salleString,"%d", salle);
             printf("\n%s",salleString);
             sprintf(anneeString,"%d", annee);
@@ -156,14 +158,11 @@ void chargement_initial(int n, TOVC fh){
             if(classeID / 60 == 1){
                 classID[0] = 'P';
             }
-            printf("\nclass id: %s\n\n", classID);
             // pour choisir les lignes dans les 2 fichiers;
-            int n1 = rand() % 8;
-            int n2 = rand() % 8;
+            n1 = rand() % 8;
+            n2 = rand() % 8;
             readLine("noms.txt",n1,noms);
             readLine("prenoms.txt",n2,prenoms);
-            printf("\non a n1 : %d et sa ligne: %s et on a termine\n",n1,noms);
-            printf("\non a n2 : %d et sa ligne: %s et on a termine et on a le sexe %c\n",n2,prenoms,prenoms[0]);
             e.numID = studentID;
             e.classID = classID;
             e.genre = prenoms[0];
@@ -171,15 +170,14 @@ void chargement_initial(int n, TOVC fh){
             for(i=0;i<strlen(prenoms);i++){
                 prenoms[i]=prenoms[i+1];
             }
-            printf("\n\non a le prenom dka: %s",prenoms);
             strcat(e.NomPrenom,prenoms);
-            printf("\ngenre: %c and name %s",e.genre,e.NomPrenom);
+            printf("\nle name: %s et le genre : %c",e.NomPrenom,e.genre);
 
      }
 }
 int main()
 {
     TOVC fh;
-    chargement_initial(7,fh);
+    chargement_initial(2,fh);
     return 0;
 }
