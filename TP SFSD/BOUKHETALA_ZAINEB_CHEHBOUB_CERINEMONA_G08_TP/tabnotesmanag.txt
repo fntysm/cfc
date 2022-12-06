@@ -1,0 +1,11 @@
+// générer les notes;
+           /* for(i=0;i<MatNum;i++){
+                tabnotes[i] = 1 + rand() % 20;
+                printf("\non a la note: %d",tabnotes[i]);
+                tabnotesChar =
+            }
+            itoa(tabnotes,tabnotesChar,10);*/
+          //longu = strlen(e.classID)+strlen(e.genre)+strlen(e.NomPrenom)+strlen(e.numID)+strlen(e.tabNotes);
+            //longu = 25;
+           // itoa(e.longEnreg,longu,10);
+           // printf("\nle tableau des notes suivant: %s",tabnotesChar);

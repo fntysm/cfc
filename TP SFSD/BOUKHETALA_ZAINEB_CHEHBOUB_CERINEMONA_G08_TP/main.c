@@ -5,26 +5,33 @@
 #define TailleBLC 70
 #define Max_enreg 20
 #define b 3
-#define MatMax 15
+#define MatMax 22
+#define MatNum 11
 #define MAX 50
-
+#define TL 3
+#define TC 3
+#define TID 4
+#define TNP 25
 /**déclaration des structures**/
 typedef struct Tbloc
 {
 	char chaine[TailleBLC];
+	int suivant;
+	int posLibre;
 }	Tbloc ;
 
 typedef struct Tbloc Buffer;
 
 typedef struct TEnreg
 {
-    int numID; // 4 caractères
+    char longEnreg[TL];
+    char numID[TID]; // 4 caractères
     // int anneeScol; , L’année de scolarisation 5/P sur un caractère
     // int classeID[1]; et numéro de salle
-    char * classID;
-    char NomPrenom[50];
+    char classID[TC];
+    char NomPrenom[TNP];
     char genre;
-    int tabNotes[MatMax];
+    char tabNotes[MatMax];
 }   Enreg;
 
 typedef struct Entete
@@ -127,57 +134,96 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     fclose(fH);
 }
 void chargement_initial(int n, TOVC fh){
-     int i; // nbr d'enreg
-     int n1,n2;
+     int i,j,n1,n2, studentID, salle, annee, longu, classeID;
      char classID[3];
      char anneeString[3];
      char salleString[2];
-     char genre, c;
-     char noms[50];
-     char prenoms[50];
-     int studentID, salle, annee;
+     char genre;
+     char noms[MAX];
+     char prenoms[MAX];
+     char studentIDchar[4];
+     int tabnotes[MatMax];
+     char tabnotesChar[MatMax];
      Enreg e;
+     Tbloc buff;
      srand(time(0));
-     // pour construire le tableau des notes
-     int note = rand() % 10;
-     int classeID;
      for(i=0;i<n;i++){
             printf("\n\ni = %d\n",i);
-            // Générer aléatoirement le numéro d’identification de l’élève.
             studentID = rand() % 10000;
-            // on va concaténér annee et salle
             salle = rand() % 10;
-            annee = 1 + rand() % 6; // if annee == 6 donc on parle de l'année préparatoire
+            annee = 1 + rand() % 6;
             sprintf(salleString,"%d", salle);
-            printf("\n%s",salleString);
             sprintf(anneeString,"%d", annee);
-            printf("\n%s",anneeString);
             strcat(anneeString,salleString);
+            // on a effectuer la clé à sa place
             strcpy(classID,anneeString);
+            printf("\nla clef de cet enregistrement: %s",e.classID);
             classeID = atoi(classID);
             if(classeID / 60 == 1){
                 classID[0] = 'P';
             }
-            // pour choisir les lignes dans les 2 fichiers;
-            n1 = rand() % 8;
-            n2 = rand() % 8;
+            n1 = rand() % 7;
+            n2 = rand() % 7;
             readLine("noms.txt",n1,noms);
             readLine("prenoms.txt",n2,prenoms);
-            e.numID = studentID;
-            e.classID = classID;
             e.genre = prenoms[0];
-            strcpy(e.NomPrenom,noms);
-            for(i=0;i<strlen(prenoms);i++){
-                prenoms[i]=prenoms[i+1];
+            printf("\non a le genre: %c",e.genre);
+            for(j=0;j<strlen(prenoms);j++){
+                prenoms[j]=prenoms[j+1];
             }
+            printf("\nprenom : %s",prenoms);
+            strcpy(e.NomPrenom,noms);
             strcat(e.NomPrenom,prenoms);
-            printf("\nle name: %s et le genre : %c",e.NomPrenom,e.genre);
+           // printf("",e.longEnreg,e.numID,e.classID,e.NomPrenom,e.genre,e.tabNotes);
 
      }
 }
+/*void enregInMC(TEnreg e, Tbloc buff){
+
+}*/
+void ecrire_chaine(TOVC* fichier, char chaine[TailleBLC], int longu, int i, int j){
+     int k;
+     int i1;
+     Tbloc buff;
+     for(k=0;k<longu;k++){
+        if(j!=TailleBLC){
+                buff.chaine[j]=chaine[k];
+                j++;
+        }
+        i1 = i;
+        i = alloc_bloc(fichier);
+        buff.suivant = i;
+        buff.posLibre = j;
+        j = 0;
+        ecriredir(fichier,i1,buff);
+        buff.chaine[j]=chaine[k];
+        j++;
+     }
+}
+void ecrire_enreg(TOVC* fichier, Enreg e, int i, int j){
+    int l;
+    char longueur[TL];
+    l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1;
+    sprintf(longueur,"%d", l);
+    ecrire_chaine(fichier,longueur,TL,i,j);
+    ecrire_chaine(fichier,e.numID,TID,i,j);
+    ecrire_chaine(fichier,e.classID,TC,i,j);
+    ecrire_chaine(fichier,e.NomPrenom,TNP,i,j);
+    ecrire_chaine(fichier,e.genre,1,i,j);
+    aff_entete(fichier,3,entete(fichier,3)+TL+l);
+}
 int main()
 {
-    TOVC fh;
-    chargement_initial(2,fh);
+    TOVC* fh;
+    Enreg e;
+    Buffer buff;
+    strcpy(e.classID,"trr");
+    e.genre = 'C';
+    strcpy(e.numID,"tres");
+    strcpy(e.longEnreg,"tre");
+    strcpy(e.tabNotes,"tresbien");
+    strcpy(e.NomPrenom,"rem85");
+    ecrire_enreg(fichier,e,1,1);
+
     return 0;
 }
