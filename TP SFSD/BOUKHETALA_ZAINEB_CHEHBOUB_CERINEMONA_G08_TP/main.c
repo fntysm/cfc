@@ -7,9 +7,9 @@
 #define b 3
 #define MatMax 15
 #define MAX 50
-#define TL 3
-#define TC 2
-#define TID 4
+#define TL 9
+#define TC 6
+#define TID 6
 #define TNP 25
 /**déclaration des structures**/
 typedef struct Tbloc
@@ -128,26 +128,16 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     fclose(fH);
 }
 void chargement_initial(int n, TOVC* fh, char* fileName){
-     int i,j,n1,n2, studentID, salle, annee, longu, classeID,f,k;
-     char classID[3];
-     char anneeString[3];
-     char salleString[2];
-     char genre;
-     char noms[MAX];
-     char prenoms[MAX];
-     char studentIDchar[4];
-     int tabnotes[MatMax];
-     char tabnotesChar[MatMax];
-     char tempID[TID] ;
-     char tempcle[TC];
-     Enreg e;
-     Tbloc buff;
-     fh = ouvrir(fileName,'N');
-     e.Teff = '0';
-     srand(time(0));
+     int i,j,n1,n2,studentID,salle,annee,longu,classeID,f,k;
+     char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
+     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax];
+     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
+     Enreg e; Tbloc buff;
+     fh = ouvrir(fileName,'N'); e.Teff = '0';
+     //srand(time(NULL));
      i=0; j=0;
      for(f=0;f<n;f++){
-            studentID = 100 + rand() % 10000;
+            studentID = 999 + rand() % 10000;
             sprintf(studentIDchar,"%d", studentID);
             strcpy(e.numID,studentIDchar);
             salle = rand() % 10;
@@ -169,13 +159,27 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             for(k=0;k<strlen(prenoms);k++){
                 prenoms[k]=prenoms[k+1];
             }
-            strcpy(e.tabNotes,"A10F20M15H17S19");
             strcpy(e.NomPrenom,noms);
             strcat(e.NomPrenom,prenoms);
+            if(e.classID[0]!='P'){
+                int a=0;
+                if(a%3==0){
+                    switch(a){
+                    case 0:{e.tabNotes[0]='A';}break;
+                    case 3:{e.tabNotes[3]='I';}break;
+                    case 6:{e.tabNotes[6]='M';}break;
+                    case 9:{e.tabNotes[9]='T';}break;
+                }else{
+                    e.tabNotes[a]= 1 + rand() % 21;
+                }
+            }
             ecrire_enreg(fh,e,i,j);
+            printf("\ni = %d, ID: %s, la clef: %s, name: %s\n",f,e.numID,e.classID,e.NomPrenom);
+            printf("genre: %c, Teff: %c, Tabnotes: %s\n",e.genre,e.Teff,e.tabNotes);
      }
      buff.posLibre = j;
      ecriredir(fh,i,buff);
+     aff_entete(fh,2,n);
 }
 void ecrire_chaine(TOVC* fichier, char chaine[TailleBLC], int longu, int i, int j){
      Tbloc buff;
@@ -228,7 +232,52 @@ void ecrire_enreg(TOVC* fichier, Enreg e, int i, int j){
     ecrire_char(fichier,e.Teff,i,j);
     aff_entete(fichier,3,entete(fichier,3)+TL+l);
 }
+void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
+{
+    int i = *s; int j = *r; int m; Tbloc buf;
+    liredir(f, i, &buf);
+    for (int k=0;k < lg; k++)
+    {
+        if ((j < TailleBLC)||(i == entete(f, 1)))
+        {
+            if ((i == entete(f, 1))&&(j == entete(f, 2)))
+            {
+                break;
+            }
+            chaine[k] = buf.chaine[j];
+            j++;
+        }
+        else
+        {
+            i++;
+            liredir(f, i, &buf);
+            chaine[k] = buf.chaine[0];
+            j = 1;
+        }
+        m = k;
+    }
+    chaine[m + 1] = '\0';
+    if (j == TailleBLC)
+    {
+        i++;
+        liredir(f, i, &buf);
+        j = 0;
+    }
+    *s = i;
+    *r = j;
+}
+/*void recherche(char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
+    Tbloc buff;
+    fh = ouvrir(filename,'A');
+    trouv=0; j=0; stop=0;
+    if(entete(fh,1)!=0){
+        i=0;
+        liredir(fh,i,buff);
+        while((i<=entete(fh,1))&&(!(trouv)&&!(stop))){
 
+        }
+    }
+}*/
 int main()
 {
     TOVC* fh;
@@ -236,7 +285,7 @@ int main()
     bool *trouv, *stop;
     int i,j;
     chargement_initial(1,fh,"fichierdebut.bin");
- //   recherche_dicho_fichier(fh,"39","chehboubcercer",trouv,stop,i,j);
+
 
 
     return 0;
