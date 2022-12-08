@@ -1,0 +1,112 @@
+void recuperer_chaine(TOVC *f, char chaine[256], int *s, int *r, int lg)
+{
+    int i = *s;
+    int j = *r;
+    int m;
+    Tbloc buf;
+    liredir(f, i, &buf);
+    for (int k = 0; k < lg; k++)
+    {
+        if ((j < TailleBLC) || (i == entete(f, 1)))
+        {
+            if ((i == entete(f, 1)) && (j == entete(f, 2)))
+            {
+                break;
+            }
+            chaine[k] = buf.chaine[j];
+            j++;
+        }
+        else
+        {
+            i++;
+            liredir(f, i, &buf);
+            chaine[k] = buf.chaine[0];
+            j = 1;
+        }
+        m = k;
+    }
+    chaine[m + 1] = '\0';
+    if (j == TailleBLC)
+    {
+        i++;
+        liredir(f, i, &buf);
+        j = 0;
+    }
+    *s = i;
+    *r = j;
+}
+void recherche_dicho_fichier (TOVC *f,char classID, char name ,bool *trouv,bool *stop,int *i , int *j)
+{
+    int binf=1;
+    int bsup=entete(f,1); //dernier bloc
+    Tbloc Buffer;
+
+    trouv= false ;
+    stop= false ;
+
+    j=0;
+    int longueurname; // longueur du name a rechercher
+
+     char *ch1=malloc(sizeof(char)*2);
+     char *longueur=malloc(sizeof(char)*3);
+     char *Nomprenom=malloc(sizeof(char)*50); //taille de classeID
+     //char *nomprenom=malloc(sizeof(char)*50); //taille de nomprenom
+
+    while (!(trouv) || (!stop) || bsup >= binf)
+
+    {
+        i==(binf+bsup)/ 2; //moitier des blocs
+        liredir(f,i,&Buffer);
+        recuperer_chaine(f,longueur,i,j,3); //longueur d'un enreg sur 3 carac
+        recuperer_chaine(f,ch1,i,j+7,2); //classeID
+
+        int comp=atoi(ch1);// numclasse de l'enreg
+
+        if (comp=atoi(classID)) //recherche dans les nomprenom
+        {
+            longueurname =strlen(name);
+            recuperer_chaine(f,Nomprenom,i,j+9,longueurname);
+
+            if (strcmp("name","Nomprenom")== 0) {trouv =true ; printf("\nexiste pas\n");} // l'etudiant existe
+
+            if (strcomp(name,Nomprenom)==1) { stop = true; printf("\nexiste pas\n"); } // etudiant n'existe pas
+
+            if (strcomp(name,Nomprenom)==-1) // on passe a l'enreg suivant
+            {
+               j=j+atoi(longueur) ;  // j 1er position de l'enreg suivant
+
+               if (j>MAX) { j=0; i++;} // on a fini le bloc
+
+            }
+        }
+
+        else
+        {
+            if (atoi(classID)<comp) //on monte vers le haut
+            {
+                bsup=i;
+            }
+            else
+            {
+                binf=i;
+            }
+        }
+
+    }
+
+}
+//fonction qui compare deux chaines
+int strcomp(char * chaine1,char *chaine2)
+{
+ int j=0;
+ while(chaine1[j] != '\0' && chaine2[j] != '\0')
+ {
+    if (chaine1[j] != chaine2[j])
+    {
+      if (chaine1[j] < chaine2[j]) return (1); // exemple B < A
+      if (chaine1[j] > chaine2[j]) return (-1);
+    }
+    j++;
+ }
+}
+
