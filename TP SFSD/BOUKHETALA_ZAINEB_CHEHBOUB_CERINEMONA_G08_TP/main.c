@@ -5,7 +5,7 @@
 #define TailleBLC 256
 #define Max_enreg 20
 #define b 3
-#define MatMax 15
+#define MatMax 16
 #define MAX 50
 #define TL 9
 #define TC 6
@@ -26,8 +26,8 @@ typedef struct TEnreg
     char classID[TC];
     char NomPrenom[TNP];
     char genre;
-    char tabNotes[MatMax];
     char Teff;
+    char tabNotes[MatMax];
 }   Enreg;
 
 typedef struct Entete
@@ -134,7 +134,7 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
      char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
      Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
      fh = ouvrir(fileName,'N');
-     //srand(time(NULL));
+     srand(time(NULL));
      i=0; j=0;
      for(f=0;f<n;f++){
             studentID = 1000 + rand() % 10000;
@@ -190,9 +190,9 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
                  }
             strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
             e.Teff = '0';
-            ecrire_enreg(fh,e,i,j);
             printf("\ni = %d, ID: %s, la clef: %s, name: %s\n",f,e.numID,e.classID,e.NomPrenom);
             printf("genre: %c, Teff: %c, Tabnotes: %skmlt\n",e.genre,e.Teff,e.tabNotes);
+            ecrire_enreg(fh,e,i,j);
      }
      buff.posLibre = j;
      ecriredir(fh,i,buff);
@@ -204,6 +204,7 @@ void ecrire_chaine(TOVC* fichier, char chaine[TailleBLC], int longu, int i, int 
      for(k=0;k<longu;k++){
         if(j!=TailleBLC){
                 buff.chaine[j]=chaine[k];
+                printf("\nwe have in the buffer: %c",buff.chaine[j]);
                 j++;
         }else{
         i1 = i;
@@ -213,9 +214,11 @@ void ecrire_chaine(TOVC* fichier, char chaine[TailleBLC], int longu, int i, int 
         j = 0;
         ecriredir(fichier,i1,buff);
         buff.chaine[j]=chaine[k];
+        printf("\nwe have in the buffer: %c",buff.chaine[j]);
         j++;
         }
      }
+     printf("\nwe have in the buffer string: %s",buff.chaine);
 }
 void ecrire_char(TOVC* fichier, char c, int i,int j){
      int i1;
@@ -243,25 +246,22 @@ void ecrire_enreg(TOVC* fichier, Enreg e, int i, int j){
     sprintf(longueur,"%d", l);
     ecrire_chaine(fichier,longueur,strlen(longueur),i,j);
     ecrire_chaine(fichier,e.numID,strlen(e.numID),i,j);
-    ecrire_chaine(fichier,e.classID,2,i,j);
+    ecrire_chaine(fichier,e.classID,strlen(e.classID),i,j);
     ecrire_chaine(fichier,e.NomPrenom,strlen(e.NomPrenom),i,j);
     ecrire_char(fichier,e.genre,i,j);
     ecrire_char(fichier,e.Teff,i,j);
+    ecrire_chaine(fichier,e.tabNotes,strlen(e.tabNotes),i,j);
     aff_entete(fichier,3,entete(fichier,3)+TL+l);
 }
 void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
 {
-	int k;
-    int i = *s; int j = *r; int m; Tbloc buf;
+	int k; int i = *s; int j = *r; int m; Tbloc buf;
     liredir(f, i, &buf);
     for ( k=0;k < lg; k++)
     {
         if ((j < TailleBLC)||(i == entete(f, 1)))
         {
-            if ((i == entete(f, 1))&&(j == entete(f, 2)))
-            {
-                break;
-            }
+            if ((i == entete(f, 1))&&(j == entete(f, 2))){break;}
             chaine[k] = buf.chaine[j];
             j++;
         }
@@ -284,7 +284,7 @@ void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
     *s = i;
     *r = j;
 }
-/*void recherche(char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
+/*void recherche(TOVC *fh,char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
     Tbloc buff;
     fh = ouvrir(filename,'A');
     trouv=0; j=0; stop=0;
