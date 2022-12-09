@@ -130,14 +130,14 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
 void chargement_initial(int n, TOVC* fh, char* fileName){
      int i,j,n1,n2,studentID,salle,annee,longu,classeID,f,k;
      char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
-     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax];
+     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
      char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
-     Enreg e; Tbloc buff;
-     fh = ouvrir(fileName,'N'); e.Teff = '0';
+     Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
+     fh = ouvrir(fileName,'N');
      //srand(time(NULL));
      i=0; j=0;
      for(f=0;f<n;f++){
-            studentID = 999 + rand() % 10000;
+            studentID = 1000 + rand() % 10000;
             sprintf(studentIDchar,"%d", studentID);
             strcpy(e.numID,studentIDchar);
             salle = rand() % 10;
@@ -162,20 +162,37 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             strcpy(e.NomPrenom,noms);
             strcat(e.NomPrenom,prenoms);
             if(e.classID[0]!='P'){
-                int a=0;
-                if(a%3==0){
+                while(a<MatMax){
+                    if(a%3==0){
                     switch(a){
                     case 0:{e.tabNotes[0]='A';}break;
                     case 3:{e.tabNotes[3]='I';}break;
                     case 6:{e.tabNotes[6]='M';}break;
                     case 9:{e.tabNotes[9]='T';}break;
+                    case 12:{e.tabNotes[12]='S';}break;}
                 }else{
-                    e.tabNotes[a]= 1 + rand() % 21;
+                    note = rand() % 21;
+                    sprintf(noteChar,"%d", note);
+                    if(note/10==0){
+                     e.tabNotes[a]='0';
+                     e.tabNotes[a+1]=noteChar[0];
+                     a++;
+                    }else{
+                     e.tabNotes[a]=noteChar[0];
+                     e.tabNotes[a+1]=noteChar[1];
+                     a++;
+                     }
                 }
-            }
+                a++;
+                }
+            }else{
+                strcpy(e.tabNotes,"NULL");
+                 }
+            strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
+            e.Teff = '0';
             ecrire_enreg(fh,e,i,j);
             printf("\ni = %d, ID: %s, la clef: %s, name: %s\n",f,e.numID,e.classID,e.NomPrenom);
-            printf("genre: %c, Teff: %c, Tabnotes: %s\n",e.genre,e.Teff,e.tabNotes);
+            printf("genre: %c, Teff: %c, Tabnotes: %skmlt\n",e.genre,e.Teff,e.tabNotes);
      }
      buff.posLibre = j;
      ecriredir(fh,i,buff);
@@ -234,9 +251,10 @@ void ecrire_enreg(TOVC* fichier, Enreg e, int i, int j){
 }
 void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
 {
+	int k;
     int i = *s; int j = *r; int m; Tbloc buf;
     liredir(f, i, &buf);
-    for (int k=0;k < lg; k++)
+    for ( k=0;k < lg; k++)
     {
         if ((j < TailleBLC)||(i == entete(f, 1)))
         {
@@ -285,8 +303,5 @@ int main()
     bool *trouv, *stop;
     int i,j;
     chargement_initial(1,fh,"fichierdebut.bin");
-
-
-
     return 0;
 }
