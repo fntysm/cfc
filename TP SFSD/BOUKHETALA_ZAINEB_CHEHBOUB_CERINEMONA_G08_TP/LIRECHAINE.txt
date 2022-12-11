@@ -1,0 +1,31 @@
+void ecrire_chaine(char nom[256],char chaine[256],int lg)
+{
+    tovc *f = ouvrir(nom,'n');
+
+int i=1;
+int j=0;
+    int x;
+    buffer buf;
+    for( int k=0; k<lg;k++)
+    {
+        if((j)<max)
+        {
+           buf.tab[j]=chaine[k];
+           j++;
+        }
+        else{
+        ecrire(f,i,&buf);
+        alloc_block(f);
+        i++;
+         buf.tab[0]=chaine[k];
+        j=1;
+        }
+    }
+    aff_entete(f,1,i);
+    aff_entete(f,2,j);
+   ecrire(f,i,&buf);
+int y;
+x=entete_f(f,1);
+y=entete_f(f,2);
+fermer(f);
+}
