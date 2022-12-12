@@ -129,78 +129,6 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     };
     fclose(fH);
 }
-void chargement_initial(int n, TOVC* fh, char* fileName){
-     int i,j,n1,n2,studentID,salle,annee,longu,classeID,f,k;
-     char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
-     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
-     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
-     Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
-     fh = ouvrir(fileName,'N');
-     srand(time(NULL));
-     i=0; j=0;
-     for(f=0;f<n;f++){
-            studentID = 1000 + rand() % 10000;
-            sprintf(studentIDchar,"%d", studentID);
-            strcpy(e.numID,studentIDchar);
-            salle = rand() % 10;
-            annee = 1 + rand() % 6;
-            sprintf(salleString,"%d", salle);
-            sprintf(anneeString,"%d", annee);
-            strcat(anneeString,salleString);
-            // on a effectuer la clé à sa place
-            classeID = atoi(anneeString);
-            if(classeID / 60 == 1){
-                anneeString[0] = 'P';
-            }
-            strncpy(e.classID,anneeString,2);
-            n1 = rand() % 9;
-            n2 = rand() % 11;
-            readLine("noms.txt",n1,noms);
-            readLine("prenoms.txt",n2,prenoms);
-            e.genre=prenoms[0];
-            for(k=0;k<strlen(prenoms);k++){
-                prenoms[k]=prenoms[k+1];
-            }
-            strcpy(e.NomPrenom,noms);
-            strcat(e.NomPrenom,prenoms);
-            if(e.classID[0]!='P'){
-                while(a<MatMax){
-                    if(a%3==0){
-                    switch(a){
-                    case 0:{e.tabNotes[0]='A';}break;
-                    case 3:{e.tabNotes[3]='I';}break;
-                    case 6:{e.tabNotes[6]='M';}break;
-                    case 9:{e.tabNotes[9]='T';}break;
-                    case 12:{e.tabNotes[12]='S';}break;}
-                }else{
-                    note = rand() % 21;
-                    sprintf(noteChar,"%d", note);
-                    if(note/10==0){
-                     e.tabNotes[a]='0';
-                     e.tabNotes[a+1]=noteChar[0];
-                     a++;
-                    }else{
-                     e.tabNotes[a]=noteChar[0];
-                     e.tabNotes[a+1]=noteChar[1];
-                     a++;
-                     }
-                }
-                a++;
-                }
-            }else{
-                strcpy(e.tabNotes,"NULLNULL000NULL");
-                 }
-            strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
-            e.Teff = '0';
-            ecrire_enreg(fh,e,i,j);
-            i = entete(fh,1);
-            j = entete(fh,3);
-            printf("\non a quitter le : %d enreg avec un j de : %d",f,j);
-     }
-    liredir(fh,0,buff);
-    printf("\nla chaine dans i: %d",strlen(buff.chaine));
-     aff_entete(fh,2,n);
-}
 int ecrire_chaine(TOVC* fichier, char chaine[256], int longu, int i, int j){
      Tbloc buff;
      int k, i1;
@@ -311,6 +239,80 @@ void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
         }
     }
 }*/
+
+void chargement_initial(int n, TOVC* fh, char* fileName){
+     int i,j,n1,n2,studentID,salle,annee,longu,classeID,f,k;
+     char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
+     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
+     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
+     Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
+     fh = ouvrir(fileName,'N');
+     srand(time(NULL));
+     i=0; j=0;
+     for(f=0;f<n;f++){
+            studentID = 1000 + rand() % 10000;
+            sprintf(studentIDchar,"%d", studentID);
+            strcpy(e.numID,studentIDchar);
+            salle = rand() % 10;
+            annee = 1 + rand() % 6;
+            sprintf(salleString,"%d", salle);
+            sprintf(anneeString,"%d", annee);
+            strcat(anneeString,salleString);
+            // on a effectuer la clé à sa place
+            classeID = atoi(anneeString);
+            if(classeID / 60 == 1){
+                anneeString[0] = 'P';
+            }
+            strncpy(e.classID,anneeString,2);
+            n1 = rand() % 9;
+            n2 = rand() % 11;
+            readLine("noms.txt",n1,noms);
+            readLine("prenoms.txt",n2,prenoms);
+            e.genre=prenoms[0];
+            for(k=0;k<strlen(prenoms);k++){
+                prenoms[k]=prenoms[k+1];
+            }
+            strcpy(e.NomPrenom,noms);
+            strcat(e.NomPrenom,prenoms);
+            if(e.classID[0]!='P'){
+                while(a<MatMax){
+                    if(a%3==0){
+                    switch(a){
+                    case 0:{e.tabNotes[0]='A';}break;
+                    case 3:{e.tabNotes[3]='I';}break;
+                    case 6:{e.tabNotes[6]='M';}break;
+                    case 9:{e.tabNotes[9]='T';}break;
+                    case 12:{e.tabNotes[12]='S';}break;}
+                }else{
+                    note = rand() % 21;
+                    sprintf(noteChar,"%d", note);
+                    if(note/10==0){
+                     e.tabNotes[a]='0';
+                     e.tabNotes[a+1]=noteChar[0];
+                     a++;
+                    }else{
+                     e.tabNotes[a]=noteChar[0];
+                     e.tabNotes[a+1]=noteChar[1];
+                     a++;
+                     }
+                }
+                a++;
+                }
+            }else{
+                strcpy(e.tabNotes,"NULLNULL000NULL");
+                 }
+            strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
+            e.Teff = '0';
+            ecrire_enreg(fh,e,i,j);
+            i = entete(fh,1);
+            j = entete(fh,3);
+            printf("\non a quitter le : %d enreg avec un j de : %d",f,j);
+     }
+    liredir(fh,0,buff);
+    printf("\nla chaine dans i: %d",strlen(buff.chaine));
+     aff_entete(fh,2,n);
+}
+
 TOVC* insertion(char* filename){
     TOVC* fichier;
     int i,j;
@@ -320,9 +322,8 @@ TOVC* insertion(char* filename){
     printf("\nle nomprenom: "); scanf("%s",&e.NomPrenom);
     printf("\nla cle: "); scanf("%s",&e.classID);
     printf("\nle tableau des notes: A20I20M20T20S20: "); scanf("%s",&e.tabNotes);
-    printf("\nle genre: ");
-    scanf("%c",&e.genre);
     e.Teff = '0';
+    //printf("\nle genre: "); scanf("%c",e.genre);
     // recherche() sinon
     i = entete(fichier,1);
     j = entete(fichier,3);
