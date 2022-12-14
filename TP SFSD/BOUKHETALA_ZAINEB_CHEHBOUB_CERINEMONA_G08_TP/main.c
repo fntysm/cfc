@@ -129,102 +129,97 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     };
     fclose(fH);
 }
-int ecrire_chaine(TOVC* fichier, char chaine[256], int longu, int i, int j){
+void ecrire_chaine(TOVC* fichier, char chaine[256], int longu, int *i, int *j){
      Tbloc buff;
      int k, i1;
-     liredir(fichier,i,buff);
+     liredir(fichier,*i,buff);
      for(k=0;k<longu;k++){
-        if(j<TailleBLC){
+        if((*j)<TailleBLC){
               //  buff.chaine[j]=chaine[k];
-                strncpy(&buff.chaine[j],&chaine[k],1);
-                j++;
+                strncpy(&buff.chaine[*j],&chaine[k],1);
+                (*j)++;
         }else{
-        i1 = i;
-        i = alloc_bloc(fichier);
-        buff.suivant = i;
-        buff.posLibre = j;
-        j = 0;
+        i1 = *i;
+        *i = alloc_bloc(fichier);
+        buff.suivant = *i;
+        buff.posLibre = *j;
+        (*j) = 0;
         ecriredir(fichier,i1,buff);
-        buff.chaine[j]=chaine[k];
-        j++;
+        buff.chaine[*j]=chaine[k];
+        (*j)++;
         }
      }
-     aff_entete(fichier,1,i);
-     aff_entete(fichier,3,j);
-     ecriredir(fichier,i,buff);
-     return j;
+     aff_entete(fichier,1,*i);
+     aff_entete(fichier,3,*j);
+     ecriredir(fichier,*i,buff);
 }
 
-int ecrire_char(TOVC* fichier, char c, int i,int j){
+void ecrire_char(TOVC* fichier, char c, int *i,int *j){
      Tbloc buff;
      int i1;
-     liredir(fichier,i,buff);
-     if(j<TailleBLC){
-                buff.chaine[j]=c;
-                j++;
+     liredir(fichier,*i,buff);
+     if((*j)<TailleBLC){
+                buff.chaine[*j]=c;
+                (*j)++;
         }else{
-        i1 = i;
-        i = alloc_bloc(fichier);
-        buff.suivant = i;
-        buff.posLibre = j;
-        j = 0;
+        i1 = *i;
+        *i = alloc_bloc(fichier);
+        buff.suivant = *i;
+        buff.posLibre = *j;
+        (*j) = 0;
         ecriredir(fichier,i1,buff);
-        buff.chaine[j]=c;
-        j++;
+        buff.chaine[*j]=c;
+        (*j)++;
         }
-        aff_entete(fichier,1,i);
-        aff_entete(fichier,3,j);
-        ecriredir(fichier,i,buff);
-        return j;
+        aff_entete(fichier,1,*i);
+        aff_entete(fichier,3,*j);
+        ecriredir(fichier,*i,buff);
+
 }
-void ecrire_enreg(TOVC* fichier, Enreg e, int i, int j){
+void ecrire_enreg(TOVC* fichier, Enreg e, int *i, int *j){
     int l,i1,k;
     Tbloc buff;
     char longueur[TL];
     l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
     sprintf(longueur,"%d", l);
-    j=ecrire_chaine(fichier,longueur,strlen(longueur),i,j);
-    j=ecrire_chaine(fichier,e.numID,4,i,j);
-    j=ecrire_chaine(fichier,e.classID,2,i,j);
+    ecrire_chaine(fichier,longueur,strlen(longueur),i,j);
+    ecrire_chaine(fichier,e.numID,4,i,j);
+    ecrire_chaine(fichier,e.classID,2,i,j);
     printf("\non va inserer l'etudiant: %s",e.NomPrenom);
-    j=ecrire_chaine(fichier,e.NomPrenom,strlen(e.NomPrenom),i,j);
-    j=ecrire_char(fichier,e.genre,i,j);
-    j=ecrire_char(fichier,e.Teff,i,j);
-    j=ecrire_chaine(fichier,e.tabNotes,strlen(e.tabNotes),i,j);
+    ecrire_chaine(fichier,e.NomPrenom,strlen(e.NomPrenom),i,j);
+    ecrire_char(fichier,e.genre,i,j);
+    ecrire_char(fichier,e.Teff,i,j);
+    ecrire_chaine(fichier,e.tabNotes,strlen(e.tabNotes),i,j);
 }
 
-void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
+void lirechaine(TOVC *fh, Tbloc buf, int n, int i, int j, char champ[])
+// on passe le pointeur du fichier comme parametre en cas de chevauchement
 {
-	int k; int i = *s; int j = *r; int m; Tbloc buf;
-    liredir(f, i, buf);
-    printf("\non est dans lirechaine: ");
-    for ( k=0;k < lg; k++)
+    int k = 0; // indice de parcours
+    Tbloc buf1;
+    buf1 = buf;
+    while (k < n) // tantque on n'est pas affecté toute la taille du mot
     {
-        if ((j < TailleBLC)||(i == entete(f, 1)))
+        champ[k] = buf1.chaine[j];
+        k++;
+        j++;
+        if ((j >= TailleBLC)) // en cas de chevauchement
         {
-            if ((i == entete(f, 1))&&(j == entete(f, 2))){break;}
-            chaine[k] = buf.chaine[j];
-            j++;
+            if (buf1.suivant != -1) // en verifie si on n'est pas dans le dernier bloc
+            {
+
+                i = buf1.suivant;          // i recoit le numero du prochain bloc
+                j = 0;                     // indice de parcours de la chaine
+                liredir(fh, i, buf1); // lire le prochain bloc
+            }
+            else // cas ou on est dans le dernier bloc
+            {
+                champ[k] = '\0';
+                break;
+            }
         }
-        else
-        {
-            i++;
-            liredir(f, i, buf);
-            chaine[k] = buf.chaine[0];
-            j = 1;
-        }
-        m = k;
     }
-    chaine[m + 1] = '\0';
-    if (j == TailleBLC)
-    {
-        i++;
-        liredir(f, i, buf);
-        j = 0;
-    }
-    *s = i;
-    *r = j;
-    printf("\nchaine: %s",chaine);
+    champ[k] = '\0';
 }
 
 /*void recherche(TOVC *fh,char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
@@ -303,30 +298,31 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
                  }
             strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
             e.Teff = '0';
-            ecrire_enreg(fh,e,i,j);
-            i = entete(fh,1);
-            j = entete(fh,3);
+            ecrire_enreg(fh,e,&i,&j);
             printf("\non a quitter le : %d enreg avec un j de : %d",f,j);
      }
     liredir(fh,0,buff);
     printf("\nla chaine dans i: %d",strlen(buff.chaine));
-     aff_entete(fh,2,n);
+    aff_entete(fh,2,n);
 }
 
 TOVC* insertion(char* filename){
     TOVC* fichier;
     int i,j;
+    char nom[TNP];
+    char prenom[TNP];
     fichier = ouvrir(filename,'A');
     Enreg e;
     printf("\nveuillez inserer: \nl'identifiant: "); scanf("%s",&e.numID);
-    printf("\nle nomprenom: "); scanf("%s",&e.NomPrenom);
+    printf("\nle nom: "); scanf("%s",&e.NomPrenom);
+    printf("le genre: "); scanf("%s",&e.genre);
     printf("\nla cle: "); scanf("%s",&e.classID);
     printf("\nle tableau des notes: A20I20M20T20S20: "); scanf("%s",&e.tabNotes);
     e.Teff = '0';
-    //printf("\nle genre: "); scanf("%c",e.genre);
     // recherche() sinon
     i = entete(fichier,1);
     j = entete(fichier,3);
+    printf("\nj: %d et i : %d",j,i);
     ecrire_enreg(fichier,e,i,j);
     return fichier;
 }
@@ -335,12 +331,11 @@ int main()
     TOVC* fh;
     Enreg e;
     Tbloc buff;
-    int i,j;
-    i=0;
     char chaine[256];
     chargement_initial(3,fh,"fichierdebut.bin");
   //  printf("\non va essayer de lire un seul enreg: \n");
     //affich_TOVC(fh);
-    fh = insertion("fichierdebut.bin");
+  //  fh = insertion("fichierdebut.bin");
+ //   printf("\non a j : %d et le dernier bloc: %d",entete(fh,3),entete(fh,1));
     return 0;
 }
