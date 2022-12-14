@@ -1,4 +1,0 @@
-- la fonction mise à jour.. mise à jour de quoi au fait, 3la hssab la moyenne de passage (pour l'archivage)
-- explication de l'archivage
-fichier initial: etudiant moyenne de passage 
-
