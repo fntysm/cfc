@@ -97,14 +97,10 @@ void liredir(TOVC *pF,int i,Tbloc *buf)
     }
 }
 
-void ecriredir(TOVC *pF,int i,Tbloc buf)
+void ecriredir(TOVC *pF,int i,Tbloc *buf)
 {
-    if (i<=entete(pF,1))
-    {
-        fseek(pF->F,sizeof(Entete)+(i-1)*sizeof(Tbloc),SEEK_SET);
-        printf("\non est dans ecriredir: %s",buf.chaine);
-        fwrite(&buf,sizeof(Tbloc),1,pF->F);
-    }
+    fseek(pF->F, sizeof(Entete) + sizeof(Tbloc) * (i - 1), SEEK_SET);
+    fwrite(buf, sizeof(Tbloc), 1, pF->F);
 }
 int alloc_bloc(TOVC *pF)
 {
@@ -129,44 +125,41 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
 }
 void ecrire_chaine(TOVC* fichier, char chaine[256], int longu, int *i, int *j){
      Tbloc buff;
-     int k, i1;
+     int k;
      for(k=0;k<longu;k++){
         if((*j)<TailleBLC){
                 buff.chaine[*j]=chaine[k];
                 (*j)++;
         }else{
-        i1 = *i;
+        ecriredir(fichier,i,&buff);
         *i = alloc_bloc(fichier);
-        buff.suivant = *i;
-        buff.posLibre = *j;
+        (*i)++;
         (*j) = 0;
-        ecriredir(fichier,i1,buff);
         buff.chaine[*j]=chaine[k];
         (*j)++;
+
         }
      }
      aff_entete(fichier,1,*i);
      aff_entete(fichier,3,*j);
-     ecriredir(fichier,*i,buff);
+     ecriredir(fichier,*i,&buff);
      printf("\nbuff: %s",buff.chaine);
 }
 
 void ecrire_char(TOVC* fichier, char c, int *i,int *j){
      Tbloc buff;
-     int i1;
      if((*j)<TailleBLC){
                 buff.chaine[*j]=c;
                 (*j)++;
         }else{
-        i1 = *i;
+        ecriredir(fichier,i,&buff);
         *i = alloc_bloc(fichier);
-        buff.suivant = *i;
-        buff.posLibre = *j;
+        (*i)++;
         (*j) = 0;
-        ecriredir(fichier,i1,buff);
         buff.chaine[*j]=c;
         (*j)++;
         }
+        ecriredir(fichier,*i,&buff);
         aff_entete(fichier,1,*i);
         aff_entete(fichier,3,*j);
 
@@ -174,14 +167,12 @@ void ecrire_char(TOVC* fichier, char c, int *i,int *j){
 void ecrire_enreg(TOVC* fichier, Enreg e, int *i, int *j){
     int l,k;
     Tbloc buff;
-    printf("\ni : %d et j : %d",*i,*j);
-    printf("\ne.longu : %s",e.longEnreg);
     ecrire_chaine(fichier,e.longEnreg,strlen(e.longEnreg),i,j);
     ecrire_chaine(fichier,e.numID,4,i,j);
     ecrire_chaine(fichier,e.classID,2,i,j);
+    ecrire_char(fichier,e.Teff,i,j);
     ecrire_chaine(fichier,e.NomPrenom,strlen(e.NomPrenom),i,j);
     ecrire_char(fichier,e.genre,i,j);
-    ecrire_char(fichier,e.Teff,i,j);
     ecrire_chaine(fichier,e.tabNotes,strlen(e.tabNotes),i,j);
 }
 
@@ -290,10 +281,11 @@ Enreg generer_enreg(){
                 a++;
                 }
             }else{
-                strcpy(e.tabNotes,"NULLNULL000NULL");
+                strcpy(e.tabNotes,"NULLNULL\0");
                  }
             strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
             e.Teff = '0';
+           // readLine("notes.txt",1,e.tabNotes);
             int l;
             char longueur[TL];
             l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
@@ -310,15 +302,14 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
      i=0; j=0;
      for(f=0;f<n;f++){
             e=generer_enreg();
-            printf("\non va inserer l'etudiant: %s",e.NomPrenom);
+            printf("\n\non va inserer l'etudiant: %s",e.NomPrenom);
             ecrire_enreg(fh,e,&i,&j);
-            printf("\non a quitter le : %d enreg avec un j de : %d et entete : %d ",f,j,entete(fh,3));
      }
     aff_entete(fh,2,n);
     int chaine[TailleBLC];
     printf("\non va entrer dans lirechaine");
     i=0; j=0;
-    lire_chaine(fh,chaine,strlen(chaine),&i,&j);
+    lire_chaine(fh,chaine,strlen(e.longEnreg),&i,&j);
     printf("\nliredir; buff: %s",chaine);
     fermer(fh);
 }
@@ -359,9 +350,8 @@ int main()
     int i=0;
     int j=0;
     strcpy(filename,"fichierdebut.bin");
-    chargement_initial(1,&fh,filename);
-
-    //fh=insertion("fichierdebut.bin");
+    chargement_initial(2,fh,filename);
+  //  fh=insertion("fichierdebut.bin");
   //  printf("\non va essayer de lire un seul enreg: \n");
     //affich_TOVC(fh);
   /*  fh = ouvrir(filename,'A');
