@@ -169,13 +169,13 @@ void ecrire_char(TOVC* fichier, char c, int *i,int *j){
         }
         aff_entete(fichier,1,*i);
         aff_entete(fichier,3,*j);
-        ecriredir(fichier,*i,buff);
 
 }
 void ecrire_enreg(TOVC* fichier, Enreg e, int *i, int *j){
     int l,k;
     Tbloc buff;
     printf("\ni : %d et j : %d",*i,*j);
+    printf("\ne.longu : %s",e.longEnreg);
     ecrire_chaine(fichier,e.longEnreg,strlen(e.longEnreg),i,j);
     ecrire_chaine(fichier,e.numID,4,i,j);
     ecrire_chaine(fichier,e.classID,2,i,j);
