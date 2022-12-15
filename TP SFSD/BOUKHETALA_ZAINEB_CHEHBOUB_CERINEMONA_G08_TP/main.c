@@ -12,7 +12,7 @@
 #define TID 6
 #define TNP 25
 
-/**dï¿½claration des structures**/
+/**déclaration des structures**/
 typedef struct Tbloc
 {
 	char chaine[TailleBLC];
@@ -234,18 +234,13 @@ void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
         }
     }
 }*/
-
-void chargement_initial(int n, TOVC* fh, char* fileName){
-     int *i,*j;
-     int n1,n2,studentID,salle,annee,longu,classeID,f,k;
-     char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
-     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
-     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
-     Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
-     fh = ouvrir(fileName,'N');
-     srand(time(NULL));
-     i=0; j=0;
-     for(f=0;f<n;f++){
+Enreg generer_enreg(){
+    Enreg e;
+    int n1,n2,studentID,salle,annee,longu,classeID,k;
+    char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
+    char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
+    char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
+    char noteChar[MatMax]; int a=0;
             studentID = 1000 + rand() % 10000;
             sprintf(studentIDchar,"%d", studentID);
             strcpy(e.numID,studentIDchar);
@@ -254,7 +249,7 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             sprintf(salleString,"%d", salle);
             sprintf(anneeString,"%d", annee);
             strcat(anneeString,salleString);
-            // on a effectuer la clï¿½ ï¿½ sa place
+            // on a effectuer la clé à sa place
             classeID = atoi(anneeString);
             if(classeID / 60 == 1){
                 anneeString[0] = 'P';
@@ -304,6 +299,17 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
             sprintf(longueur,"%d", l);
             strcpy(e.longEnreg,longueur);
+    return e;
+}
+void chargement_initial(int n, TOVC* fh, char* fileName){
+     int *i,*j;
+     int f,k;
+     Enreg e; Tbloc buff;
+     fh = ouvrir(fileName,'N');
+     srand(time(NULL));
+     i=0; j=0;
+     for(f=0;f<n;f++){
+            e=generer_enreg();
             printf("\non va inserer l'etudiant: %s",e.NomPrenom);
             ecrire_enreg(fh,e,&i,&j);
             printf("\non a quitter le : %d enreg avec un j de : %d et entete : %d ",f,j,entete(fh,3));
@@ -353,7 +359,8 @@ int main()
     int i=0;
     int j=0;
     strcpy(filename,"fichierdebut.bin");
-    chargement_initial(2,&fh,filename);
+    chargement_initial(1,&fh,filename);
+
     //fh=insertion("fichierdebut.bin");
   //  printf("\non va essayer de lire un seul enreg: \n");
     //affich_TOVC(fh);
