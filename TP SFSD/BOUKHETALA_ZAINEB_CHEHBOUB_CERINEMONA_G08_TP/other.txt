@@ -12,7 +12,7 @@
 #define TID 6
 #define TNP 25
 
-/**d�claration des structures**/
+/**déclaration des structures**/
 typedef struct Tbloc
 {
 	char chaine[TailleBLC];
@@ -88,13 +88,12 @@ void aff_entete(TOVC *pF,int i,int val)
     else (pF->entete).indice_libre=val;
 }
 
-void liredir(TOVC *pF,int i,Tbloc *buf)
+void liredir(TOVC *f, int i, Tbloc *buf)
 {
-    if (i<=entete(pF,1))
-    {
-        fseek(pF->F,sizeof(Entete)+(i-1)*sizeof(Tbloc),SEEK_SET);
-        fread(buf,sizeof(Tbloc),1,pF->F);
-    }
+
+    fseek(f->F, (sizeof(Entete) + sizeof(Tbloc) * (i - 1)), SEEK_SET);
+    fread(buf, sizeof(Tbloc), 1, f->F);
+    rewind(f->F);
 }
 
 void ecriredir(TOVC *pF,int i,Tbloc buf)
@@ -187,59 +186,51 @@ void ecrire_enreg(TOVC* fichier, Enreg e, int *i, int *j){
     ecrire_chaine(fichier,e.tabNotes,strlen(e.tabNotes),i,j);
 }
 
-void lire_chaine(TOVC *f, char chaine[256], int lg, int *i, int *j)
+void lire_chaine(TOVC *f, char chaine[256], int lg, int *s, int *r)
 {
+    int i = *s;
+    int j = *r;
     int m;
     Tbloc buf;
     liredir(f, i, &buf);
     for (int k = 0;k < lg; k++)
     {
-        if ((*j < TailleBLC) || (*i == entete(f, 1)))
+        if ((j < TailleBLC) || (i == entete(f, 1)))
         {
-            if ((*i == entete(f, 1)) && (*j == entete(f, 3)))
+            if ((i == entete(f, 1)) && (j == entete(f, 3)))
             {
                 break;
             }
-            chaine[k] = buf.chaine[*j];
-            printf("\nbuf.chaine[j]: %c",buf.chaine[*j]);
-            (*j)++;
+            chaine[k] = buf.chaine[j];
+            printf("\nbuf.chaine[j]: %c",buf.chaine[j]);
+            j++;
         }
         else
         {
-            (*i)++;
+            i++;
             liredir(f, i, &buf);
             chaine[k] = buf.chaine[0];
-            *j = 0;
+            j = 0;
         }
         m = k;
     }
     chaine[m + 1] = '\0';
-    if (*j == TailleBLC)
+    if (j == TailleBLC)
     {
-        (*i)++;
+        i++;
         liredir(f, i, &buf);
-        *j = 0;
+        j = 0;
     }
+    *s = i;
+    *r = j;
 }
-/*void recherche(TOVC *fh,char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
-    Tbloc buff;
-    fh = ouvrir(filename,'A');
-    trouv=0; j=0; stop=0;
-    if(entete(fh,1)!=0){
-        i=0;
-        liredir(fh,i,buff);
-        while((i<=entete(fh,1))&&(!(trouv)&&!(stop))){
-
-        }
-    }
-}*/
 
 void chargement_initial(int n, TOVC* fh, char* fileName){
      int *i,*j;
      int n1,n2,studentID,salle,annee,longu,classeID,f,k;
      char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
      char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
-     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC];
+     char tabnotesChar[MatMax]; char tempID[TID] ; char tempcle[TC]; char chaine[256];
      Enreg e; Tbloc buff; char noteChar[MatMax]; int a=0;
      fh = ouvrir(fileName,'N');
      srand(time(NULL));
@@ -253,7 +244,7 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             sprintf(salleString,"%d", salle);
             sprintf(anneeString,"%d", annee);
             strcat(anneeString,salleString);
-            // on a effectuer la cl� � sa place
+            // on a effectuer la clé à sa place
             classeID = atoi(anneeString);
             if(classeID / 60 == 1){
                 anneeString[0] = 'P';
@@ -298,16 +289,15 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
                  }
             strcpy(&e.tabNotes[MatMax], &e.tabNotes[MatMax+1]);
             e.Teff = '0';
+            int s=i;
+            int r=j;
             ecrire_enreg(fh,e,&i,&j);
+            printf("\non a quitter le : %d enreg avec un j de : %d et entete : %d ",f,j,entete(fh,3));
+            lire_chaine(fh,chaine,40,&s,&r);
+            printf("\non a la chaine: %s",chaine);
             printf("\non a quitter le : %d enreg avec un j de : %d et entete : %d ",f,j,entete(fh,3));
      }
     aff_entete(fh,2,n);
-    int chaine[TailleBLC];
-    printf("\non va entrer dans lirechaine");
-    i=0; j=0;
-    liredir(fh,i,&buff);
-    printf("buff: %s",buff.chaine);
-   // lire_chaine(fh,chaine,strlen(chaine),&i,&j);
     fermer(fh);
 }
 
@@ -332,7 +322,92 @@ TOVC* insertion(char* filename){
     printf("\nj: %d et i : %d",j,i);
     return fichier;
 }
+/*void recherche(TOVC *fh,char * filename ,char clef[TC], char nomprenom[TNP], int longu , int trouv, int i, int j){
+    Tbloc buff;
+    fh = ouvrir(filename,'A');
+    trouv=0; j=0; stop=0;
+    if(entete(fh,1)!=0){
+        i=0;
+        liredir(fh,i,buff);
+        while((i<=entete(fh,1))&&(!(trouv)&&!(stop))){
 
+        }
+    }
+}*/
+//fonction qui compare deux chaines
+int strcomp(char * chaine1,char * chaine2)
+{
+ int j=0;
+ while(chaine1[j] != '\0' && chaine2[j] != '\0')
+ {
+    if (chaine1[j] != chaine2[j])
+    {
+      if (chaine1[j] < chaine2[j]) return (1); // exemple B < A
+      if (chaine1[j] > chaine2[j]) return (-1);
+    }
+    j++;
+ }
+}
+
+
+/*void recherche_dicho_fichier(TOVC *f, char classID[TC], char NomPrenom[TNP], bool *trouv, bool *stop, int *i , int *j)
+{
+    Tbloc Buffer;
+    int binf=1;
+    int bsup=entete(f,1); //dernier bloc
+    trouv= false ;
+    stop= false ;
+    j=0;
+    int longueurname; // longueur du name a rechercher
+    char *ch1=malloc(sizeof(char)*2);
+    char *longueur=malloc(sizeof(char)*3);
+    char *Nomprenom=malloc(sizeof(char)*50); //taille de classeID
+     //char *nomprenom=malloc(sizeof(char)*50); //taille de nomprenom
+
+    while (!(trouv) || (!stop) || bsup >= binf)
+
+    {
+        i==(binf+bsup)/ 2; //moitier des blocs
+        liredir(f,i,&Buffer);
+        recuperer_chaine(3,i,j,longueur); //longueur d'un enreg sur 3 carac
+        recuperer_chaine(2,i,j+7,ch1); //classeID
+
+        int comp=atoi(ch1);// numclasse de l'enreg
+
+        if (comp=atoi(classID)) //recherche dans les nomprenom
+        {
+            longueurname =strlen(name);
+            recuperer_chaine(longueurname,i,j+9,Nomprenom);
+
+            if (strcmp("name","Nomprenom")== 0) {trouv =true ;} // l'etudiant existe
+
+            if (strcomp(name,Nomprenom)==1) { stop = true; } // etudiant n'existe pas
+
+            if (strcomp(name,Nomprenom)==-1) // on passe a l'enreg suivant
+            {
+               j=j+atoi(longueur) ;  // j 1er position de l'enreg suivant
+
+               if (j>MAX) { j=0; i++;} // on a fini le bloc
+
+            }
+        }
+
+        else
+        {
+            if (atoi(classID)<comp) //on monte vers le haut
+            {
+                bsup=i;
+            }
+            else
+            {
+                binf=i;
+            }
+        }
+
+    }
+
+}
+*/
 int main()
 {
     TOVC* fh;
@@ -342,14 +417,18 @@ int main()
     char * filename;
     int i=0;
     int j=0;
-    strcpy(filename,"fichierdebut.bin");
-    chargement_initial(2,&fh,filename);
-   // fh=insertion("fichierdebut.bin");
+    strcpy(filename,"fichierother.bin");
+    chargement_initial(1,&fh,filename);
+  //  fh=insertion("fichierdebut.bin");
   //  printf("\non va essayer de lire un seul enreg: \n");
     //affich_TOVC(fh);
   /*  fh = ouvrir(filename,'A');
+    */
+    //
    // printf("\non a j : %d et le dernier bloc: %d",entete(fh,3),entete(fh,1));
    /* TOVC *f = ouvrir("fichierdebut.bin",'N');
+    strcpy(chaine,"life is a willow and it bent right into your wind");
+    ecrire_chainedjihane(f,chaine,strlen(chaine),i,j);
     printf("\non a termine l'insertion et i : %d et j : %d",i,j);*/
     return 0;
 }
