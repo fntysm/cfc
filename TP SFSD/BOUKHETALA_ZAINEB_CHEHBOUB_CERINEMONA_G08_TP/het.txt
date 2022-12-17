@@ -127,7 +127,7 @@ void ecrire_chaine(TOVC* fichier, char chaine[256], int longu, int *i, int *j){
                 buff.chaine[*j]=chaine[k];
                 (*j)++;
         }else{
-        ecriredir(fichier,*i,&buff);
+        ecriredir(fichier,i,&buff);
         *i = alloc_bloc(fichier);
         (*i)++;
         (*j) = 0;
@@ -148,7 +148,7 @@ void ecrire_char(TOVC* fichier, char c, int *i,int *j){
                 buff.chaine[*j]=c;
                 (*j)++;
         }else{
-        ecriredir(fichier,*i,&buff);
+        ecriredir(fichier,i,&buff);
         *i = alloc_bloc(fichier);
         (*i)++;
         (*j) = 0;
@@ -236,6 +236,7 @@ Enreg generer_enreg(){
             sprintf(salleString,"%d", salle);
             sprintf(anneeString,"%d", annee);
             strcat(anneeString,salleString);
+            // on a effectuer la cl� � sa place
             classeID = atoi(anneeString);
             if(classeID / 60 == 1){
                 anneeString[0] = 'P';
@@ -301,6 +302,11 @@ void chargement_initial(int n, TOVC* fh, char* fileName){
             ecrire_enreg(fh,e,&i,&j);
      }
     aff_entete(fh,2,n);
+    int chaine[TailleBLC];
+    printf("\non va entrer dans lirechaine");
+    i=0; j=0;
+    lire_chaine(fh,chaine,strlen(e.longEnreg),&i,&j);
+    printf("\nliredir; buff: %s",chaine);
     fermer(fh);
 }
 
@@ -336,7 +342,11 @@ int main()
     Enreg e;
     Tbloc buff;
     char chaine[256];
-    chargement_initial(2,fh,"fichierdebut.bin");
+    char * filename;
+    int i=0;
+    int j=0;
+    strcpy(filename,"fichierdebut.bin");
+    chargement_initial(2,fh,filename);
   //  fh=insertion("fichierdebut.bin");
   //  printf("\non va essayer de lire un seul enreg: \n");
     //affich_TOVC(fh);
@@ -346,3 +356,4 @@ int main()
     printf("\non a termine l'insertion et i : %d et j : %d",i,j);*/
     return 0;
 }
+
