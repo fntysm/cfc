@@ -246,7 +246,6 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
 }
 Enreg generer_enreg(){
     Enreg e;
-    srand(time(NULL));
     int n1,n2,studentID,salle,annee,longu,classeID,k;
     int t=0;
     char classID[3]; char anneeString[3]; char salleString[2]; char genre; char noms[MAX];
@@ -294,6 +293,7 @@ Enreg generer_enreg(){
 void chargement_initial(char fileName[256],int n){
      int f,k;
      Enreg e; buffer buff;
+     srand(time(NULL));
      e=generer_enreg();
      ecrire_enreg(fileName,e,'N');
      for(f=0;f<n-1;f++){
@@ -310,6 +310,6 @@ int s=1;
 int r=0;
 char chaine[256];
 lire_chaine("djihene",chaine,TailleBLC,&s,&r);
-printf("\nla chaine: %s",chaine);
+printf("\nla chaine qu'on a lit: %s",chaine);
     return 0;
 }
