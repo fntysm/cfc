@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define TailleBLC 70
+#define TailleBLC 256
 #define Max_enreg 20
 #define b 3
 #define MatMax 16
@@ -144,6 +144,7 @@ void ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
     aff_Entete(fichier,2,j);
     ecriredir(fichier,i,&buf);
     aff_Entete(fichier,3,entete_fich(fichier,3)+1);
+    printf("\nj: %d",entete_fich(fichier,2));
     fermer(fichier);
 }
 
@@ -156,7 +157,6 @@ void lire_chaine(char name[256], char chaine[256], int longu, int *s, int *r)
     int m;
     buffer buf;
     liredir(f,i,&buf);
-
     for (int k = 0; k < longu; k++)
     {
         if ((j < TailleBLC) || (i == entete_fich(f, 1)))
@@ -224,7 +224,7 @@ void ecrire_enreg(char name[256], Enreg e, char mode){
     strcat(chaine,e.NomPrenom);
     strcat(chaine,e.genre);
     strcat(chaine,e.tabNotes);
-    printf("\nla chaine qu'on va inserer: %s\n",chaine);
+    printf("\nla chaine qu'on va inserer: %s et sa longu: %d\n",chaine,atoi(e.longEnreg)+2);
     ecrire_chaine(name,chaine,atoi(e.longEnreg)+2,mode);
 }
 /**fonctions relatives à l'énoncé du TP**/
@@ -291,25 +291,51 @@ Enreg generer_enreg(){
     return e;
 }
 void chargement_initial(char fileName[256],int n){
-     int f,k;
+     int f,k; char chaine[256];
      Enreg e; buffer buff;
      srand(time(NULL));
-     e=generer_enreg();
-     ecrire_enreg(fileName,e,'N');
-     for(f=0;f<n-1;f++){
+     for(f=0;f<n;f++){
             e=generer_enreg();
-            printf("\n\non va inserer l'etudiant: %s",e.NomPrenom);
-            ecrire_enreg(fileName,e,'A');
+            strcpy(chaine,e.longEnreg);
+            strcat(chaine,e.numID);
+            strcat(chaine,e.classID);
+            strcat(chaine,"0"); // celui de Teff
+            strcat(chaine,e.NomPrenom);
+            strcat(chaine,e.genre);
+            strcat(chaine,e.tabNotes);
+            printf("\nla chaine qu'on va inserer: %s et sa longu: %d\n",chaine,atoi(e.longEnreg)+2);
+            if(f==0){
+               printf("\n\non va inserer l'etudiant: %s",e.NomPrenom);
+               ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'N');
+            }else{
+               printf("\n\non va inserer l'etudiant: %s",e.NomPrenom);
+               ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'A');
+            }
      }
 }
 
 int main()
 {
-chargement_initial("djihene",1);
+chargement_initial("zed",3);
 int s=1;
 int r=0;
 char chaine[256];
-lire_chaine("djihene",chaine,TailleBLC,&s,&r);
-printf("\nla chaine qu'on a lit: %s",chaine);
+TOVC *f=ouvrir("zed",'A');
+int d=entete_fich(f,2);
+printf("\nyek d : %d",d);
+fermer(f);
+lire_chaine("zed",chaine,d,&s,&r);
+printf("\n%s",chaine);
+lire_chaine("zed",chaine,d,&s,&r);
+printf("\n%s",chaine);
+lire_chaine("zed",chaine,d,&s,&r);
+printf("\n%s",chaine);
+/*ecrire_chaine("zed","abcde",5,'N');
+ecrire_chaine("zed","fuandk",6,'A');
+int s=1;
+int r=0;
+char chaine[256];
+lire_chaine("zed",chaine,11,&s,&r);
+printf("\n%s",chaine);*/
     return 0;
 }
