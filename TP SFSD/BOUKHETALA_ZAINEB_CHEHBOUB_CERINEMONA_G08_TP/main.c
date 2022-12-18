@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <time.h>
-#define TailleBLC 256
+#define TailleBLC 100
 #define Max_enreg 20
 #define b 3
 #define MatMax 16
@@ -16,7 +17,6 @@
 /**le bloc**/
 typedef struct Tbloc{
 char chaine[TailleBLC];
-int nb;
 }Tbloc;
 /**le buffer**/
 typedef  Tbloc buffer;
@@ -120,7 +120,6 @@ int alloc_Tbloc(TOVC *f)
 /**fonctions qu'on utilise presque partout**/
 /**ecrire chaine**/
 void ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
-
      TOVC *fichier=ouvrir(name,mode);
      buffer buf;
      int i = entete_fich(fichier,1);
@@ -149,7 +148,6 @@ void ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
     printf("\nj: %d",entete_fich(fichier,2));
     fermer(fichier);
     lire_chaine(name,chaine,longu,&s,&r);
-    printf("\net la chaine insereee est : %s",chaine);
 }
 
 /**lire chaine**/
@@ -192,18 +190,32 @@ void lire_chaine(char name[256], char chaine[256], int longu, int *s, int *r)
     *r = j;
     fermer(f);
 }
-void ecrire_enreg(char name[256], Enreg e, char mode){
-    char chaine[256];
-    strcpy(chaine,e.longEnreg);
-    strcat(chaine,e.numID);
-    strcat(chaine,e.classID);
-    strcat(chaine,"0"); // celui de Teff
-    strcat(chaine,e.NomPrenom);
-    strcat(chaine,e.genre);
-    strcat(chaine,e.tabNotes);
-    printf("\nla chaine qu'on va inserer: %s\n",chaine);
-    ecrire_chaine(name,chaine,atoi(e.longEnreg)+2,mode);
-}
+void affichage(char nom[256])
+  {
+
+      int i=1;
+      int j=0;
+      buffer buf;
+       int stop=0;
+       TOVC *f=ouvrir(nom,'A');
+       printf("i: %d et j : %d",entete_fich(f,1),entete_fich(f,2));
+     while(i<=entete_fich(f,1))
+     {
+         j=0;
+         liredir(f,i,&buf);
+         printf("\nbloc =%d : ",i);
+         while((j<TailleBLC))
+         {
+
+             printf("%c",buf.chaine[j]);
+             j++;
+
+         }
+         printf("\n");
+         i++;
+     }
+     fermer(f);
+  }
 /**fonctions relatives à l'énoncé du TP**/
 // read a specific line from a file
 void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
@@ -267,25 +279,123 @@ Enreg generer_enreg(){
             strcpy(e.longEnreg,longueur);
     return e;
 }
+void generer_chaine_enreg(Enreg e, char chaine[256]){
+    strcpy(chaine,e.longEnreg);
+    strcat(chaine,e.numID);
+    printf("\nclass id 3 cara: %s",e.classID);
+    strcat(chaine,e.classID);
+    strcat(chaine,"0"); // celui de Teff
+    strcat(chaine,e.NomPrenom);
+    strcat(chaine,e.genre);
+    strcat(chaine,e.tabNotes);
+    printf("\nla chaine qu'on va inserer: %s\n",chaine);
+}
 void chargement_initial(char fileName[256],int n){
-     int f,k;
-     Enreg e; buffer buff;
+     int k;
+     Enreg e,e1; buffer buff;
+     char chaine[256];
+     char chaine1[256];
      srand(time(NULL));
-     for(f=0;f<n;f++){
-            e=generer_enreg();
-            printf("\n\non va inserer l'etudiant: %s",e.NomPrenom);
-            if(f==0){
-               ecrire_enreg(fileName,e,'N');
-            }else{
-               ecrire_enreg(fileName,e,'A');
+   /*  e=generer_enreg();
+     generer_chaine_enreg(e,chaine);
+     printf("\non a cette chaine: %s",chaine);*/
+     strcpy(chaine,"381478420GuittoneMohamedMA12I07M06T00S11");
+  //   ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'N');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'N');
+     strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"361635260ChehboubKamalMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"287075P80BouhadiMalekMNULLNULL");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"357317300MarradjiMonaFA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+    }
+bool recherche_dicho_fichier(char fileName[256],char classID[2], char name[TNP])
+{
+    int binf=1; int i;
+    TOVC* f=ouvrir(fileName,'A');
+    int bsup=entete_fich(f,1);//dernier bloc
+    fermer(f);
+    printf("\non a bsup: %d",bsup);
+    buffer Buffer;
+    bool trouv = false;
+    bool stop = false;
+    int j=0;
+    int longueurname; // longueur du name a rechercher
+    char *ch1=malloc(sizeof(char)*2); //taille de classeID
+    char *longueur=malloc(sizeof(char)*2);
+    char *Nomprenom=malloc(sizeof(char)*TNP);
+    while (!(trouv) || !(stop) || bsup >= binf)
+    {
+        i=(binf+bsup)/ 2; //moitier des blocs
+        lire_chaine(fileName,longueur,2,&i,&j); //longueur d'un enreg sur 2 carac
+        printf("\nlongu qu'on a trouve: %s et i: %d et j: %d",longueur,i,j);
+        j=j+4;
+        lire_chaine(f,ch1,2,&i,&j); //classeID
+        printf("\ncle qu'on a trouve: %s et i: %d et j: %d",ch1,i,j);
+        int comp=atoi(ch1);// numclasse de l'enreg
+        if (comp==atoi(classID)) //recherche dans les nomprenom
+        {
+            j++;
+            longueurname=strlen(name);
+            lire_chaine(f,Nomprenom,longueurname,&i,&j);
+            printf("\nnomprenom qu'on a trouve: %s et i: %d et j: %d",Nomprenom,i,j);
+            if (strcmp(name,Nomprenom)== 0) {trouv=true ; printf("\nexiste\n"); return trouv;}
+            else{
+            if (strcomp(name,Nomprenom)==1) { stop = true; printf("\nexiste pas\n"); } // etudiant n'existe pas
+            if (strcomp(name,Nomprenom)==-1) // on passe a l'enreg suivant
+            {
+               j=j+atoi(longueur) ;  // j 1er position de l'enreg suivant
+
+               if (j>TailleBLC) { j=0; i++;} // on a fini le bloc
+
             }
-     }
+            }
+        }
+        else
+        {
+            if (atoi(classID)<comp) //on monte vers le haut
+            {
+                bsup=i;
+            }
+            else
+            {
+                binf=i;
+            }
+        }
+
+    }
+
+}
+//fonction qui compare deux chaines
+int strcomp(char * chaine1,char *chaine2)
+{
+ int j=0;
+ while(chaine1[j] != '\0' && chaine2[j] != '\0')
+ {
+    if (chaine1[j] != chaine2[j])
+    {
+      if (chaine1[j] < chaine2[j]) return (1); // exemple B < A
+      if (chaine1[j] > chaine2[j]) return (-1);
+    }
+    j++;
+ }
 }
 
 int main()
 {
-chargement_initial("zed",3);
-char chaine[256];
-
-    return 0;
+buffer buff;
+char chaine[256]; char chaine1[256];
+srand(time(NULL));
+int f=0;
+Enreg e,e1; char fileName[256]="zed";
+//chargement_initial(fileName,2);
+affichage(fileName);
+bool trouv;
+trouv=recherche_dicho_fichier(fileName,"42","GuittoneMohamed");
+printf("\ntrouv: %d",trouv);
+return 0;
 }
