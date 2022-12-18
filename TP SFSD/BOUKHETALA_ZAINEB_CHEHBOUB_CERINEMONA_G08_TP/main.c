@@ -43,7 +43,12 @@ typedef struct TEnreg
     char Teff[1];
     char tabNotes[MatMax];
 }   Enreg;
-
+typedef struct RechMan
+{
+    int i;
+    int j;
+    bool trouv;
+}ijtrouv;
 /**la machine abstraite**/
 
 TOVC* ouvrir(char nom[256],char mode)
@@ -145,7 +150,6 @@ void ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
     aff_Entete(fichier,2,j);
     ecriredir(fichier,i,&buf);
     aff_Entete(fichier,3,entete_fich(fichier,3)+1);
-    printf("\nj: %d",entete_fich(fichier,2));
     fermer(fichier);
     lire_chaine(name,chaine,longu,&s,&r);
 }
@@ -295,81 +299,27 @@ void chargement_initial(char fileName[256],int n){
      Enreg e,e1; buffer buff;
      char chaine[256];
      char chaine1[256];
-     srand(time(NULL));
+    // srand(time(NULL));
    /*  e=generer_enreg();
      generer_chaine_enreg(e,chaine);
      printf("\non a cette chaine: %s",chaine);*/
-     strcpy(chaine,"381478420GuittoneMohamedMA12I07M06T00S11");
   //   ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'N');
-     ecrire_chaine(fileName,chaine,strlen(chaine),'N');
-     strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-     strcpy(chaine,"361635260ChehboubKamalMA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
      strcpy(chaine,"287075P80BouhadiMalekMNULLNULL");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'N');
+     strcpy(chaine,"361635260ChehboubKamalMA12I07M06T00S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
      strcpy(chaine,"357317300MarradjiMonaFA12I07M06T00S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-    }
-bool recherche_dicho_fichier(char fileName[256],char classID[2], char name[TNP])
-{
-    int binf=1; int i;
-    TOVC* f=ouvrir(fileName,'A');
-    int bsup=entete_fich(f,1);//dernier bloc
-    fermer(f);
-    printf("\non a bsup: %d",bsup);
-    buffer Buffer;
-    bool trouv = false;
-    bool stop = false;
-    int j=0;
-    int longueurname; // longueur du name a rechercher
-    char *ch1=malloc(sizeof(char)*2); //taille de classeID
-    char *longueur=malloc(sizeof(char)*2);
-    char *Nomprenom=malloc(sizeof(char)*TNP);
-    while (!(trouv) || !(stop) || bsup >= binf)
-    {
-        i=(binf+bsup)/ 2; //moitier des blocs
-        lire_chaine(fileName,longueur,2,&i,&j); //longueur d'un enreg sur 2 carac
-        printf("\nlongu qu'on a trouve: %s et i: %d et j: %d",longueur,i,j);
-        j=j+4;
-        lire_chaine(f,ch1,2,&i,&j); //classeID
-        printf("\ncle qu'on a trouve: %s et i: %d et j: %d",ch1,i,j);
-        int comp=atoi(ch1);// numclasse de l'enreg
-        if (comp==atoi(classID)) //recherche dans les nomprenom
-        {
-            j++;
-            longueurname=strlen(name);
-            lire_chaine(f,Nomprenom,longueurname,&i,&j);
-            printf("\nnomprenom qu'on a trouve: %s et i: %d et j: %d",Nomprenom,i,j);
-            if (strcmp(name,Nomprenom)== 0) {trouv=true ; printf("\nexiste\n"); return trouv;}
-            else{
-            if (strcomp(name,Nomprenom)==1) { stop = true; printf("\nexiste pas\n"); } // etudiant n'existe pas
-            if (strcomp(name,Nomprenom)==-1) // on passe a l'enreg suivant
-            {
-               j=j+atoi(longueur) ;  // j 1er position de l'enreg suivant
-
-               if (j>TailleBLC) { j=0; i++;} // on a fini le bloc
-
-            }
-            }
-        }
-        else
-        {
-            if (atoi(classID)<comp) //on monte vers le haut
-            {
-                bsup=i;
-            }
-            else
-            {
-                binf=i;
-            }
-        }
-
+     strcpy(chaine,"381478420GuittoneMohamedMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"346945550MahrezMariaMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
     }
 
-}
 //fonction qui compare deux chaines
 int strcomp(char * chaine1,char *chaine2)
 {
@@ -384,18 +334,82 @@ int strcomp(char * chaine1,char *chaine2)
     j++;
  }
 }
-
+void manfonc(int n,int *i,int *j){
+    int f=0;
+    int s = *i;
+    int r = *j;
+    while(f<n){
+        r++;
+        if(r==TailleBLC){
+            r=0; s++;
+        }
+        f++;
+    }
+    *i = s;
+    *j = r;
+}
+ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
+    ijtrouv e;
+    int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
+    TOVC* f=ouvrir(fileName,'A');
+    int dernierbloc=entete_fich(f,1);
+    fermer(f);
+    char *clenreg=malloc(sizeof(char)*2); //taille de classeID
+    char *longueur=malloc(sizeof(char)*2);
+    char *Nomprenom=malloc(sizeof(char)*TNP);
+    char *Teff=malloc(sizeof(char)*1);
+    while((!trouv)&&(!stop)&&(i<=dernierbloc)){
+            s=i; r=j;
+            lire_chaine(fileName,longueur,2,&i,&j);
+            printf("\nlongu : %s et i : %d et j : %d",longueur, i, j);
+            manfonc(4,&i,&j);
+            lire_chaine(fileName,clenreg,2,&i,&j);
+            printf("\ncle : %s et i : %d et j : %d mais on a %s et la comp entre: %d",clenreg, i, j,cle,strcmp(cle,clenreg));
+            if(clenreg[0]=='P'){
+                clenreg[0]='0';
+            }
+            if(strcmp(cle,clenreg)==0){
+                lire_chaine(fileName,Teff,1,&i,&j);
+                printf("\nTeff: %s et i : %d et j : %d",Teff, i, j);
+                if(strcmp(Teff,"0")==0){
+                    lire_chaine(fileName,Nomprenom,strlen(name),&i,&j);
+                    printf("\nname : %s et i : %d et j : %d",Nomprenom, i, j);
+                    if(strcmp(Nomprenom,name)==0){
+                        trouv=true;
+                    }else{
+                        if(strcomp(name,Nomprenom)==1){
+                            stop=true;
+                        }
+                    }
+                }
+            }else{
+                int c1=atoi(clenreg);
+                int c2=atoi(cle);
+                if(c1>c2){stop=true;}
+                if(c1<c2){
+                    printf("\non est daccord");
+            i=s; j=r;
+            manfonc(atoi(longueur)+2,&i,&j);
+            }
+            }
+    }
+    i=s; j=r;
+    manfonc(atoi(longueur)+2,&i,&j);
+    e.trouv = trouv;
+    e.i = i;
+    e.j = j;
+    return e;
+}
 int main()
 {
 buffer buff;
+ijtrouv enregi;
 char chaine[256]; char chaine1[256];
-srand(time(NULL));
 int f=0;
 Enreg e,e1; char fileName[256]="zed";
 //chargement_initial(fileName,2);
 affichage(fileName);
-bool trouv;
-trouv=recherche_dicho_fichier(fileName,"42","GuittoneMohamed");
-printf("\ntrouv: %d",trouv);
+enregi=rechercheTOVC(fileName,"55","MahrezKarim");
+printf("\nwhat did we got from it: i : %d,j :  %d, trouv: %d",enregi.i,enregi.j,enregi.trouv);
 return 0;
 }
