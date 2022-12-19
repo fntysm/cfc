@@ -314,9 +314,11 @@ void chargement_initial(char fileName[256],int n){
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
      strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
+     strcpy(chaine,"346945551MahrezKarimMA12I07M06T00S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-     strcpy(chaine,"346945550MahrezMariaMA12I07M06T00S11");
+     strcpy(chaine,"346945550MahrezLamiaFA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     strcpy(chaine,"346945550MahrezMariaFA12I07M06T00S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A');
     }
 
@@ -349,6 +351,7 @@ void manfonc(int n,int *i,int *j){
     *j = r;
 }
 ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
+    printf("\non est entre dans : %s",name);
     ijtrouv e;
     int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
     TOVC* f=ouvrir(fileName,'A');
@@ -361,19 +364,15 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
     while((!trouv)&&(!stop)&&(i<=dernierbloc)){
             s=i; r=j;
             lire_chaine(fileName,longueur,2,&i,&j);
-            printf("\nlongu : %s et i : %d et j : %d",longueur, i, j);
             manfonc(4,&i,&j);
             lire_chaine(fileName,clenreg,2,&i,&j);
-            printf("\ncle : %s et i : %d et j : %d mais on a %s et la comp entre: %d",clenreg, i, j,cle,strcmp(cle,clenreg));
             if(clenreg[0]=='P'){
                 clenreg[0]='0';
             }
             if(strcmp(cle,clenreg)==0){
                 lire_chaine(fileName,Teff,1,&i,&j);
-                printf("\nTeff: %s et i : %d et j : %d",Teff, i, j);
                 if(strcmp(Teff,"0")==0){
                     lire_chaine(fileName,Nomprenom,strlen(name),&i,&j);
-                    printf("\nname : %s et i : %d et j : %d",Nomprenom, i, j);
                     if(strcmp(Nomprenom,name)==0){
                         trouv=true;
                     }else{
@@ -387,7 +386,6 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
                 int c2=atoi(cle);
                 if(c1>c2){stop=true;}
                 if(c1<c2){
-                    printf("\non est daccord");
             i=s; j=r;
             manfonc(atoi(longueur)+2,&i,&j);
             }
@@ -400,16 +398,35 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
     e.j = j;
     return e;
 }
+void insertionTOVC(char fileName[256]){
+ijtrouv en;
+char nom[TNP]; int clenreg; char cle[2];
+printf("\nBienvenue dans la procedure d'Insertion:\n");
+printf("\nveuillez inserer successivement l'annee de scolarisation (0 pour P) et la salle (de 0 a 9 ) ie: 09 ou 53 : ");
+scanf("%d",&clenreg);
+printf("veuillez inserer le nom et le prenom de l'eleve : ");
+scanf("%s", &nom);
+sprintf(cle,"%d", clenreg);
+en=rechercheTOVC(fileName,cle,nom);
+    if(en.trouv){
+        printf("\netudiant deja insere");
+        printf("\non a i : %d et j : %d",en.i,en.j); return;
+    }else{
+    printf("\nnon insere");}
+}
 int main()
 {
 buffer buff;
 ijtrouv enregi;
 char chaine[256]; char chaine1[256];
-int f=0;
+int f=0; int c;
+char nom[TNP];
+int clenreg;
 Enreg e,e1; char fileName[256]="zed";
-//chargement_initial(fileName,2);
+chargement_initial(fileName,2);
 affichage(fileName);
-enregi=rechercheTOVC(fileName,"55","MahrezKarim");
-printf("\nwhat did we got from it: i : %d,j :  %d, trouv: %d",enregi.i,enregi.j,enregi.trouv);
+/*enregi=rechercheTOVC(fileName,"55","MahrezMaria");
+printf("\nwhat did we got from it: i : %d,j :  %d, trouv: %d",enregi.i,enregi.j,enregi.trouv);*/
+insertionTOVC(fileName);
 return 0;
 }
