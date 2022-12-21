@@ -3,8 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
-#define TailleBLC 100
-#define Max_enreg 20
+#define TailleBLC 100 // taille du bloc
 #define b 3
 #define MatMax 16
 #define MAX 50
@@ -35,32 +34,33 @@ Entete entete;
 /**l'enreg**/
 typedef struct TEnreg
 {
-    char longEnreg[TL];
-    char numID[TID];
-    char classID[TC];
+    char longEnreg[TL]; /**la longueur de l'enregistrement**/
+    char numID[TID]; /**l'identifiant de l'étudiant**/
+    char classID[TC]; /**l'année de scolarisation+la salle**/
     char NomPrenom[TNP];
     char genre[1];
     char Teff[1];
     char tabNotes[MatMax];
 }   Enreg;
-typedef struct RechMan
+typedef struct RechMan /**un enregistrement manipuler les blocs et positions durant la recherche**/
 {
     int i;
     int j;
     bool trouv;
 }ijtrouv;
+
 /**la machine abstraite**/
 
 TOVC* ouvrir(char nom[256],char mode)
  {
      TOVC* f=malloc(sizeof(TOVC));
-     if(mode=='A')
+     if(mode=='A') /**ouverture en mode ancien**/
      {
          f->fichier=fopen(nom,"rb+");
          fread(&(f->entete),sizeof(struct Entete),1,f->fichier);
      }
      else{
-            if(mode=='N')
+            if(mode=='N') /**ouverture en mode nouveau**/
             {
          f->fichier=fopen(nom,"wb+");
          f->entete.nb_Tbloc=1;
@@ -75,7 +75,7 @@ TOVC* ouvrir(char nom[256],char mode)
 
 void fermer(TOVC *f)
  {
-     rewind(f->fichier); //positionner le curseur au debut du fichier
+     rewind(f->fichier); /**positionner le curseur au debut du fichier**/
      fwrite(&(f->entete),sizeof(struct Entete),1,f->fichier);
      fclose(f->fichier);
      free(f);
@@ -122,15 +122,14 @@ int alloc_Tbloc(TOVC *f)
        return entete_fich(f,1);
 }
 /**fin de machine abstraite**/
+
 /**fonctions qu'on utilise presque partout**/
 /**ecrire chaine**/
-ijtrouv ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
+void ecrire_chaine(char name[256], char chaine[256], int longu, char mode, int *s, int *r){
      TOVC *fichier=ouvrir(name,mode);
      buffer buf;
-     int i = entete_fich(fichier,1);
-     int j = entete_fich(fichier,2);
-     int *s=i;
-     int *r=j;
+     int i = *s;
+     int j = *r;
      liredir(fichier,i,&buf);
        for(int k=0;k<longu;k++)
         {
@@ -147,10 +146,9 @@ ijtrouv ecrire_chaine(char name[256], char chaine[256], int longu, char mode){
         j=1;
         }
         }
-    aff_Entete(fichier,1,i);
-    aff_Entete(fichier,2,j);
     ecriredir(fichier,i,&buf);
-    aff_Entete(fichier,3,entete_fich(fichier,3)+1);
+    *s = i;
+    *r = j;
     fermer(fichier);
 }
 
@@ -194,10 +192,12 @@ void lire_chaine(char name[256], char chaine[256], int longu, int *s, int *r)
     *r = j;
     fermer(f);
 }
+/**une fonction pour afficher le fichier TOVC**/
 void affichage(char nom[256])
-  {int i=1; int j=0; buffer buf; int stop=0;
+  {
+   int i=1; int j=0; buffer buf; int stop=0;
    TOVC *f=ouvrir(nom,'A');
-printf("i: %d et j : %d",entete_fich(f,1),entete_fich(f,2));
+   printf("\ni: %d et j : %d",entete_fich(f,1),entete_fich(f,2));
      while(i<=entete_fich(f,1))
      {
          j=0;
@@ -216,7 +216,7 @@ printf("i: %d et j : %d",entete_fich(f,1),entete_fich(f,2));
      fermer(f);
   }
 /**fonctions relatives à l'énoncé du TP**/
-// read a specific line from a file
+/**pour lire une ligne spécifique d'un fichier texte (pour choisir aléatoirement les noms et prénoms)**/
 void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     FILE *fH;
     int lines = 0;
@@ -228,10 +228,10 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     while(!(feof(fH)) && (lines<=lineNum)){
         lines++;
         fscanf(fH, "%s", buffer);
-        //fgets(buffer, MAX, fH);
     };
     fclose(fH);
 }
+/**une fonction pour génerer un enregistrement selon les critères de l'énoncé du TP**/
 Enreg generer_enreg(){
     Enreg e;
     int n1,n2,studentID,salle,annee,longu,classeID,k;
@@ -267,9 +267,10 @@ Enreg generer_enreg(){
             t++;
             }
             if(e.classID[0]!='P'){
-                readLine("notes.txt",2,e.tabNotes);
+                int noteligne = 1 + rand() % 11;
+                readLine("notes.txt",noteligne,e.tabNotes);
             }else{
-                strcpy(e.tabNotes,"NULLNULL\0");
+                strcpy(e.tabNotes,"NULLNULL000NULL\0");
                  }
             int l;
             char longueur[TL];
@@ -295,31 +296,38 @@ void chargement_initial(char fileName[256],int n){
      Enreg e,e1; buffer buff;
      char chaine[256];
      char chaine1[256];
+     int i = 1;
+     int j = 0;
     // srand(time(NULL));
    /*  e=generer_enreg();
      generer_chaine_enreg(e,chaine);
      printf("\non a cette chaine: %s",chaine);*/
   //   ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'N');
-     strcpy(chaine,"287075P80BouhadiMalekMNULLNULL");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'N');
+     strcpy(chaine,"357075P80BouhadiMalekMNULLNULL000NULL");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
      strcpy(chaine,"361635260ChehboubKamalMA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      strcpy(chaine,"357317300MarradjiMonaFA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      strcpy(chaine,"381478420GuittoneMohamedMA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
-     strcpy(chaine,"346945551MahrezKarimMA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
+     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      strcpy(chaine,"346945550MahrezLamiaFA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      strcpy(chaine,"346945550MahrezMariaFA12I07M06T00S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
+     TOVC* fichier=ouvrir(fileName,'A');
+     aff_Entete(fichier,1,i);
+     aff_Entete(fichier,2,j);
+     aff_Entete(fichier,3,n);
+     fermer(fichier);
      return;
     }
 
-//fonction qui compare deux chaines
+/**fonction qui compare deux chaines (on en aura besoin pour le tri par nomsprenoms**/
 int strcomp(char * chaine1,char *chaine2)
 {
  int j=0;
@@ -333,6 +341,8 @@ int strcomp(char * chaine1,char *chaine2)
     j++;
  }
 }
+/**une fonction pour manipuler les i et j (blocs et positions)**/
+/**on l'utilise pour sauter directement à une j par n positions vers la fin du fichier**/
 void manfonc(int n,int *i,int *j){
     int f=0;
     int s = *i;
@@ -347,8 +357,23 @@ void manfonc(int n,int *i,int *j){
     *i = s;
     *j = r;
 }
+/**une fonction pour manipuler les i et j (blocs et positions), elle fait l'inverse de manfonc**/
+void foncman(int n,int *i,int *j){
+    int f=0;
+    int s = *i;
+    int r = *j;
+    while(f<n){
+        r--;
+        if(r==0){
+            r=TailleBLC; s--;
+        }
+        f++;
+    }
+    *i = s;
+    *j = r;
+}
+/**la recherche**/
 ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
-    printf("\non est entre dans : %s",name);
     ijtrouv e;
     int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
     TOVC* f=ouvrir(fileName,'A');
@@ -400,6 +425,7 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
     e.j = j;
     return e;
 }
+/**l'insertion TOVC**/
 void insertionTOVC(char fileName[256]){
 ijtrouv en;
 Enreg e; int l;
@@ -422,30 +448,38 @@ if(clee<10){
     strcpy(cle,clef);
 }
 en=rechercheTOVC(fileName,cle,nom);
+printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
     if(en.trouv){
         printf("\netudiant deja insere");
         return;
     }else{
-    printf("\nnon insere");
+    printf("\nnon insere\n");
+    strcpy(e.classID,cle);
+    strcpy(e.Teff,"0");
+    strcpy(e.NomPrenom,nom);
+    printf("\nle genre: "); scanf("%s",&e.genre);
+    printf("\nle tableau des notes: A20I20M20T20S20: "); scanf("%s",&e.tabNotes);
+    printf("\nle id:"); scanf("%s",&e.numID);
+    l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
+    sprintf(longueur,"%d", l);
+    strcpy(e.longEnreg,longueur);
+    generer_chaine_enreg(e,chaine);
     if((en.j==j)&&(en.i==i)){
-        strcpy(e.classID,cle);
-        strcpy(e.Teff,"0");
-        strcpy(e.NomPrenom,nom);
-        printf("\nle genre: "); scanf("%s",&e.genre);
-        printf("\nle tableau des notes: A20I20M20T20S20: "); scanf("%s",&e.tabNotes);
-        printf("\nle id:"); scanf("%s",&e.numID);
-        l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
-        sprintf(longueur,"%d", l);
-        strcpy(e.longEnreg,longueur);
-        generer_chaine_enreg(e,chaine);
-        ecrire_chaine(fileName,chaine,strlen(chaine),'A');
+        ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
+        TOVC* fichier=ouvrir(fileName,'A');
+        aff_Entete(fichier,1,i);
+        aff_Entete(fichier,2,j);
+        fermer(fichier);
+    }else{
+        printf("\nlazm decalage hh\n");
     }
     }
 }
-TOVC* suppressionTOVC(char filename[256])
+/**la suppression**/
+void suppressionTOVC(char filename[256])
 {
-char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; char eff;
-printf("\nBienvenue dans la procedure d'Insertion:\n");
+char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; char eff[1]; int i,j,n;
+printf("\nBienvenue dans la procedure de suppression logique:\n");
 printf("\nveuillez inserer successivement l'annee de scolarisation (0 pour P) et la salle (de 0 a 9 ) ie: 09 ou 53 : ");
 scanf("%d",&clenreg);
 printf("veuillez inserer le nom et le prenom de l'eleve : ");
@@ -458,10 +492,18 @@ if(clee<10){
     strcpy(cle,clef);
 }
 en=rechercheTOVC(filename,cle,nom);
-    if (en.trouv){ eff = '1'; ecrire_chaine(filename,eff,1,'A');
+    if (en.trouv){
+            printf("\napres trouv: i : %d et j : %d et strlen: %d",en.i,en.j,strlen(nom));
+            i=en.i; j=en.j;
+            n=17+strlen(nom);
+            foncman(n,&i,&j);
+            printf("\napres foncman: i : %d et j : %d et n : %d\n",i,j,n);
+            strcpy(eff,"1"); ecrire_chaine(filename,eff,1,'A',&i,&j);
 }
-   else {printf("\n etudiant n existe pas");}
-
+    else {printf("\netudiant n existe pas");}
+    TOVC* fich = ouvrir(filename,'A');
+    aff_Entete(fich,4,entete_fich(fich,4)+1);
+    fermer(fich);
     return;
 }
 int main()
@@ -473,16 +515,9 @@ int f=0; int c;
 char nom[TNP];
 int clenreg;
 Enreg e,e1; char fileName[256]="zed";
-chargement_initial(fileName,8);
+//chargement_initial(fileName,8);
 affichage(fileName);
-/*enregi=rechercheTOVC(fileName,"61","BoukhetalaZaineb");
-printf("\nwhat did we got from it: i : %d,j :  %d, trouv: %d",enregi.i,enregi.j,enregi.trouv);*/
-//insertionTOVC(fileName);
-/*printf("\napres avoir termine l'insertion au dernier:");
-affichage(fileName);*/
-/*strcpy(chaine,"396945610BoukhetalaZainebFA12I17M16T17S13");
-ecrire_chaine(fileName,chaine,strlen(chaine),'A');*/
-
-
+insertionTOVC(fileName);
+affichage(fileName);
 return 0;
 }
