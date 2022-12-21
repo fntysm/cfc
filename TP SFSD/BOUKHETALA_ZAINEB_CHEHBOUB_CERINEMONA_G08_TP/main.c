@@ -417,9 +417,60 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
             if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
             }
             }
-    }
+        }
     i=s; j=r;
     manfonc(atoi(longueur)+2,&i,&j);
+    e.trouv = trouv;
+    e.i = i;
+    e.j = j;
+    return e;
+}
+ijtrouv rechercheTOVC20(char fileName[256], char cle[2], char name[TNP]){
+    ijtrouv e;
+    int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
+    TOVC* f=ouvrir(fileName,'A');
+    int dernierbloc=entete_fich(f,1);
+    int dernierepos=entete_fich(f,2);
+    fermer(f);
+    char *clenreg=malloc(sizeof(char)*2); //taille de classeID
+    char *longueur=malloc(sizeof(char)*2);
+    char *Nomprenom=malloc(sizeof(char)*TNP);
+    char *Teff=malloc(sizeof(char)*1);
+    while((!trouv)&&(!stop)&&(i<=dernierbloc))
+        {
+            s=i; r=j;
+            lire_chaine(fileName,longueur,2,&i,&j);
+            manfonc(4,&i,&j);
+            lire_chaine(fileName,clenreg,2,&i,&j);
+            if(clenreg[0]=='P'){
+                clenreg[0]='0';
+            }
+            if(strcmp(cle,clenreg)==0){
+                lire_chaine(fileName,Teff,1,&i,&j);
+                    lire_chaine(fileName,Nomprenom,strlen(name),&i,&j);
+                    if(strcmp(Nomprenom,name)==0){
+                        if(strcmp(Teff,"0")==0){
+                            trouv=true;
+                        }else{
+                            stop=true;
+                        }
+                    }else{
+                        if(strcomp(name,Nomprenom)==1){
+                            stop=true;
+                        }
+                    }
+            }else{
+                int c1=atoi(clenreg);
+                int c2=atoi(cle);
+                if(c1>c2){stop=true;}
+                if(c1<c2){
+            i=s; j=r;
+            manfonc(atoi(longueur)+2,&i,&j);
+            if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
+            }
+            }
+        }
+    i=s; j=r;
     e.trouv = trouv;
     e.i = i;
     e.j = j;
@@ -447,7 +498,7 @@ if(clee<10){
     strcat(clef,cle);
     strcpy(cle,clef);
 }
-en=rechercheTOVC(fileName,cle,nom);
+en=rechercheTOVC20(fileName,cle,nom);
 printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
     if(en.trouv){
         printf("\netudiant deja insere");
@@ -472,6 +523,19 @@ printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
         fermer(fichier);
     }else{
         printf("\nlazm decalage hh\n");
+        int s1=en.i; int r1=en.j;
+        int s2=s1; int r2=r1;
+        int dernierposN = en.j+j;
+        int dernierBlocN = en.i;
+        if(dernierposN>TailleBLC){
+            dernierBlocN++;
+        }
+        char chaineTMP[256];
+            while((s1<dernierBlocN)&&(r1<dernierposN)){
+             lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
+             ecrire_chaine(fileName,chaine,strlen(chaine),'A',&s2,&r2);
+             strcpy(chaine,chaineTMP);
+            }
     }
     }
 }
@@ -515,7 +579,7 @@ int f=0; int c;
 char nom[TNP];
 int clenreg;
 Enreg e,e1; char fileName[256]="zed";
-//chargement_initial(fileName,8);
+chargement_initial(fileName,8);
 affichage(fileName);
 insertionTOVC(fileName);
 affichage(fileName);
