@@ -525,20 +525,19 @@ printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
         printf("\nlazm decalage hh\n");
         int s1=en.i; int r1=en.j;
         int s2=s1; int r2=r1;
-        int dernierposN = en.j+j;
-        int dernierBlocN = en.i;
-        if(dernierposN>TailleBLC){
-            dernierBlocN++;
-        }
+        int dernierPosN = j+l+2;
         char chaineTMP[256];
-            while((s1<dernierBlocN)&&(r1<dernierposN)){
-             lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
-             ecrire_chaine(fileName,chaine,strlen(chaine),'A',&s2,&r2);
-             strcpy(chaine,chaineTMP);
+            for(int k=0;k<i*strlen(chaine);k++){
+            printf("\navant chaine tmp: %d et %d",s1,r1);
+            lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
+            printf("\napres chaine tmp: %d et %d",s1,r1);
+            ecrire_chaine(fileName,chaine,strlen(chaine),'A',&s2,&r2);
+            printf("\napres chaine: 2 %d et %d",s2,r2);
+            strcpy(chaine,chaineTMP);
+            }
+            }
             }
     }
-    }
-}
 /**la suppression**/
 void suppressionTOVC(char filename[256])
 {
