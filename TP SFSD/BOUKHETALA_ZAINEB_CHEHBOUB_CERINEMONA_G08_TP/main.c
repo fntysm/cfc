@@ -126,10 +126,10 @@ int alloc_Tbloc(TOVC *f)
 /**fonctions qu'on utilise presque partout**/
 /**ecrire chaine**/
 void ecrire_chaine(char name[256], char chaine[256], int longu, char mode, int *s, int *r){
-     TOVC *fichier=ouvrir(name,mode);
-     buffer buf;
      int i = *s;
      int j = *r;
+     TOVC *fichier=ouvrir(name,mode);
+     buffer buf;
      liredir(fichier,i,&buf);
        for(int k=0;k<longu;k++)
         {
@@ -484,6 +484,7 @@ char chaine[256]; char longueur[2];
 TOVC* fh=ouvrir(fileName,'A');
 int i=entete_fich(fh,1);
 int j=entete_fich(fh,2);
+int n=entete_fich(fh,3);
 fermer(fh);
 char nom[TNP]; int clenreg; char cle[2]; char clef[2];
 printf("\nBienvenue dans la procedure d'Insertion:\n");
@@ -498,8 +499,7 @@ if(clee<10){
     strcat(clef,cle);
     strcpy(cle,clef);
 }
-en=rechercheTOVC20(fileName,cle,nom);
-printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
+en=rechercheTOVC(fileName,cle,nom);
     if(en.trouv){
         printf("\netudiant deja insere");
         return;
@@ -520,21 +520,22 @@ printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
         TOVC* fichier=ouvrir(fileName,'A');
         aff_Entete(fichier,1,i);
         aff_Entete(fichier,2,j);
+        aff_Entete(fichier,3,entete_fich(fichier,3)+1);
         fermer(fichier);
     }else{
-        printf("\nlazm decalage hh\n");
-        int s1=en.i; int r1=en.j;
-        int s2=s1; int r2=r1;
-        int dernierPosN = j+l+2;
-        char chaineTMP[256];
-            for(int k=0;k<i*strlen(chaine);k++){
-            printf("\navant chaine tmp: %d et %d",s1,r1);
-            lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
-            printf("\napres chaine tmp: %d et %d",s1,r1);
-            ecrire_chaine(fileName,chaine,strlen(chaine),'A',&s2,&r2);
-            printf("\napres chaine: 2 %d et %d",s2,r2);
-            strcpy(chaine,chaineTMP);
-            }
+        en=rechercheTOVC20(fileName,cle,nom);
+        printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
+        int s=en.i; int r=en.j; char chaineTMP[256];
+        int s1=s; int r1=r;
+        int dernierBloc = i;
+        int dernierPos = j + strlen(chaine);
+        for(int k=0;k<n+1;k++){
+        r=r1; s=s1;
+        lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
+        ecrire_chaine(fileName,chaine,strlen(chaine),'A',&s,&r);
+        printf("\napres l'ecriture : s: %d et r: %d et chaine: %s",s,r,chaine);
+        strcpy(chaine,chaineTMP);
+        }
             }
             }
     }
@@ -556,11 +557,9 @@ if(clee<10){
 }
 en=rechercheTOVC(filename,cle,nom);
     if (en.trouv){
-            printf("\napres trouv: i : %d et j : %d et strlen: %d",en.i,en.j,strlen(nom));
             i=en.i; j=en.j;
             n=17+strlen(nom);
             foncman(n,&i,&j);
-            printf("\napres foncman: i : %d et j : %d et n : %d\n",i,j,n);
             strcpy(eff,"1"); ecrire_chaine(filename,eff,1,'A',&i,&j);
 }
     else {printf("\netudiant n existe pas");}
