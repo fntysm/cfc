@@ -3,9 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
-#define TailleBLC 100 // taille du bloc
+#define TailleBLC 97 // taille du bloc
 #define b 3
-#define MatMax 16
+#define MatMax 25
 #define MAX 50
 #define TL 9
 #define TC 6
@@ -330,21 +330,21 @@ void chargement_initial(char fileName[256],int n){
      generer_chaine_enreg(e,chaine);
      printf("\non a cette chaine: %s",chaine);*/
   //   ecrire_chaine(fileName,chaine,atoi(e.longEnreg)+2,'N');
-     strcpy(chaine,"357075P80BouhadiMalekMNULLNULL000NULL");
+     strcpy(chaine,"447075P80BouhadiMalekMA00I00M00T00F00N00H00S00");
      ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
-     strcpy(chaine,"361635260ChehboubKamalMA12I07M06T00S11");
+     strcpy(chaine,"451635260ChehboubKamalMA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"357317300MarradjiMonaFA12I07M06T00S11");
+     strcpy(chaine,"447317300MarradjiMonaFA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"381478420GuittoneMohamedMA12I07M06T00S11");
+     strcpy(chaine,"471478420GuittoneMohamedMA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"351569450MahrezZainebFA12I07M06T00S11");
+     strcpy(chaine,"441569450MahrezZainebFA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"346945550MahrezKarimMA12I07M06T00S11");
+     strcpy(chaine,"436945550MahrezKarimMA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"346945550MahrezLamiaFA12I07M06T00S11");
+     strcpy(chaine,"436945550MahrezLamiaFA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"346945550MahrezMariaFA12I07M06T00S11");
+     strcpy(chaine,"436945550MahrezMariaFA12I07M06T00F13N17H16S11");
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      TOVC* fichier=ouvrir(fileName,'A');
      aff_Entete(fichier,1,i);
@@ -533,10 +533,13 @@ en=rechercheTOVC(fileName,cle,nom);
     }else{
     printf("\nnon insere\n");
     strcpy(e.classID,cle);
+    if(clee<10){
+    e.classID[0]='P';
+      }
     strcpy(e.Teff,"0");
     strcpy(e.NomPrenom,nom);
     printf("\nle genre: "); scanf("%s",&e.genre);
-    printf("\nle tableau des notes: A20I20M20T20S20: "); scanf("%s",&e.tabNotes);
+    printf("\nle tableau des notes: A20I20M20T20F20N20H20S20: "); scanf("%s",&e.tabNotes);
     printf("\nle id:"); scanf("%s",&e.numID);
     l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
     sprintf(longueur,"%d", l);
@@ -553,7 +556,7 @@ en=rechercheTOVC(fileName,cle,nom);
         if(j>TailleBLC){
              j=j-TailleBLC; i++;
                        }
-            while((s!=i+1)){
+            while((s!=i+1)&&(r!=j+1)){
                  r=r1; s=s1;
                  lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
                  ecrire_chaine2(fileName,chaine,strlen(chaine),'A',&s,&r);
@@ -585,9 +588,11 @@ if(clee<10){
 }
 en=rechercheTOVC(filename,cle,nom);
     if (en.trouv){
+            printf("\ntrouv: i : %d et j : %d",en.i,en.j);
             i=en.i; j=en.j;
-            n=17+strlen(nom);
+            n=26+strlen(nom);
             foncman(n,&i,&j);
+            printf("\ntrouv: n : %d",n);
             strcpy(eff,"1"); ecrire_chaine(filename,eff,1,'A',&i,&j);
 }
     else {printf("\netudiant n existe pas");}
@@ -596,9 +601,12 @@ en=rechercheTOVC(filename,cle,nom);
     fermer(fich);
     return;
 }
-void miseajourTOVC(char fileName[256]){
-char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; int i,j,n;
-printf("\nBienvenue dans la procedure de la mise a jour:\n");
+
+
+/**mise à jour des notes**/
+void miseajourTOVCnotes(char fileName[256]){
+char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; int n; bool stop=false; char note[2];
+printf("\nBienvenue dans la procedure de la mise a jour:\n"); char choice;
 printf("\nveuillez inserer successivement l'annee de scolarisation (0 pour Preparatoire) et la salle (de 0 a 9 ) ie: 09 ou 53 : ");
 scanf("%d",&clenreg);
 printf("veuillez inserer le nom et le prenom de l'eleve : ");
@@ -611,10 +619,48 @@ if(clee<10){
     strcpy(cle,clef);
 }
 en=rechercheTOVC(fileName,cle,nom);
-printf("\non a cherche et i : %d et j: %d",en.i,en.j);
+int s=en.i; int r=en.j;
 if(en.trouv){
-    printf("\nmise a jour des notes");
-}else{
+    while(!stop){
+        char c; printf("\nlaquelle de ces matieres voulez vous changer, entrer le caractere correspondant A20I20M20T20F20N20H20S20: ");
+        scanf(" %c",&c); int j=r; int i=s;
+        printf("\nla nouvelle note a inserer: "); scanf(" %s",&note);
+        switch(c){
+            case 'A':{printf("vous allez changer la note de l'examen de la langue arabe ");
+                      foncman(23,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'I':{printf("vous allez changer la note de l'examen de l'education islamique ");
+                      foncman(20,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'M':{printf("vous allez changer la note de l'examen de les mathematiques ");
+                      foncman(17,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'T':{printf("vous allez changer la note de l'examen de la langue berbere ");
+                      foncman(14,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);}break;
+            case 'F':{printf("vous allez changer la note de l'examen de la langue francaise");
+                      foncman(11,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'N':{printf("vous allez changer la note de l'examen de l'anglais");
+                      foncman(8,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'H':{printf("vous allez changer la note de l'examen de l'histoire/geo");
+                      foncman(5,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            case 'S':{printf("vous allez changer la note de l'examen du sport");
+                      foncman(2,&i,&j);
+                      ecrire_chaine2(fileName,note,2,'A',&i,&j);
+            }break;
+            default: {printf("matiere inexistante");}break;
+    }
+    printf("\nest ce que vous voulez changer une autre note? Y/N : "); scanf(" %c",&choice); if(choice=='N')stop=true;
+}}else{
     printf("\netudiant non existant et donc impossible de faire la mise a jour\n");
     return;
 }
@@ -630,7 +676,7 @@ int clenreg;
 Enreg e,e1; char fileName[256]="zed";
 chargement_initial(fileName,8);
 affichage(fileName);
-miseajourTOVC(fileName);
+insertionTOVC(fileName);
 affichage(fileName);
 return 0;
 }

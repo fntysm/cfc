@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1671315157 source:e:\2cp\sfsd\cfc\tp sfsd\boukhetala_zaineb_chehboub_cerinemona_g08_tp\main.c
+1671879753 source:e:\2cp\sfsd\cfc\tp sfsd\boukhetala_zaineb_chehboub_cerinemona_g08_tp\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<stdbool.h>
 	<time.h>
 
