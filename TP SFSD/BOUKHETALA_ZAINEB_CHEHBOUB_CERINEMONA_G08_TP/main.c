@@ -12,7 +12,7 @@
 #define TID 6
 #define TNP 25
 
-/**déclaration des structures**/
+/**dÃ©claration des structures**/
 /**le bloc**/
 typedef struct Tbloc{
 char chaine[TailleBLC];
@@ -35,8 +35,8 @@ Entete entete;
 typedef struct TEnreg
 {
     char longEnreg[TL]; /**la longueur de l'enregistrement**/
-    char numID[TID]; /**l'identifiant de l'étudiant**/
-    char classID[TC]; /**l'année de scolarisation+la salle**/
+    char numID[TID]; /**l'identifiant de l'Ã©tudiant**/
+    char classID[TC]; /**l'annÃ©e de scolarisation+la salle**/
     char NomPrenom[TNP];
     char genre[1];
     char Teff[1];
@@ -242,8 +242,8 @@ void affichage(char nom[256])
      }
      fermer(f);
   }
-/**fonctions relatives à l'énoncé du TP**/
-/**pour lire une ligne spécifique d'un fichier texte (pour choisir aléatoirement les noms et prénoms)**/
+/**fonctions relatives Ã  l'Ã©noncÃ© du TP**/
+/**pour lire une ligne spÃ©cifique d'un fichier texte (pour choisir alÃ©atoirement les noms et prÃ©noms)**/
 void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     FILE *fH;
     int lines = 0;
@@ -258,7 +258,7 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     };
     fclose(fH);
 }
-/**une fonction pour génerer un enregistrement selon les critères de l'énoncé du TP**/
+/**une fonction pour gÃ©nerer un enregistrement selon les critÃ©res de l'Ã©noncÃ© du TP**/
 Enreg generer_enreg(){
     Enreg e;
     int n1,n2,studentID,salle,annee,longu,classeID,k;
@@ -275,7 +275,7 @@ Enreg generer_enreg(){
             sprintf(salleString,"%d", salle);
             sprintf(anneeString,"%d", annee);
             strcat(anneeString,salleString);
-            // on a effectuer la clé à sa place
+            // on a effectuer la clï¿½ ï¿½ sa place
             classeID = atoi(anneeString);
             if(classeID / 60 == 1){
                 anneeString[0] = 'P';
@@ -306,17 +306,15 @@ Enreg generer_enreg(){
             strcpy(e.longEnreg,longueur);
     return e;
 }
-const char * generer_chaine_enreg(Enreg e, char chaine[256]){
+void generer_chaine_enreg(Enreg e, char chaine[256]){
     strcpy(chaine,e.longEnreg);
     strcat(chaine,e.numID);
-    printf("\nclass id 3 cara: %s",e.classID);
     strcat(chaine,e.classID);
     strcat(chaine,"0"); // celui de Teff
     strcat(chaine,e.NomPrenom);
     strcat(chaine,e.genre);
     strcat(chaine,e.tabNotes);
     printf("\nla chaine qu'on va inserer: %s\n",chaine);
-    return chaine;
 }
 void chargement_initial(char fileName[256],int n){
      int k;
@@ -369,7 +367,7 @@ int strcomp(char * chaine1,char *chaine2)
  }
 }
 /**une fonction pour manipuler les i et j (blocs et positions)**/
-/**on l'utilise pour sauter directement à une j par n positions vers la fin du fichier**/
+/**on l'utilise pour sauter directement Ã  une j par n positions vers la fin du fichier**/
 void manfonc(int n,int *i,int *j){
     int f=0;
     int s = *i;
@@ -603,7 +601,7 @@ en=rechercheTOVC(filename,cle,nom);
 }
 
 
-/**mise à jour des notes**/
+/**mise Ã  jour des notes**/
 void miseajourTOVCnotes(char fileName[256]){
 char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; int n; bool stop=false; char note[2];
 printf("\nBienvenue dans la procedure de la mise a jour:\n"); char choice;
@@ -669,14 +667,89 @@ int main()
 {
 buffer buff;
 ijtrouv enregi;
-char chaine[256]; char chaine1[256];
+char chaine[256];
 int f=0; int c;
 char nom[TNP];
 int clenreg;
 Enreg e,e1; char fileName[256]="zed";
 chargement_initial(fileName,8);
 affichage(fileName);
-insertionTOVC(fileName);
-affichage(fileName);
+system("COLOR B4");
+int CHOICE;
+int Fin=1;
+int FinProg=1;
+    printf("\n                     BIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
+    printf("\n                                                       ****MENU****: \n");
+    printf("\n1- Insertion d'un eleve\n");
+    printf("\n2- Mise a jour des classes\n");
+    printf("\n3- Mise a jour des notes\n");
+    printf("\n4- Suppression d'un etudiant\n");
+    printf("\n5- Archivage\n");
+    printf("\nchoisissez une option: ");
+    scanf("%d",&CHOICE);
+    while(FinProg){
+    switch(CHOICE){
+           case 1:{
+                Fin=1;
+                while(Fin){
+                system("cls");
+                system("COLOR 5B");
+                insertionTOVC(fileName);
+                affichage(fileName);
+                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
+                scanf("%d",&Fin);}
+                system("pause");
+           }break;
+           case 2:{
+                Fin=1;
+                while(Fin){
+                system("COLOR 5B");
+                system("cls");
+                printf("\nmise a jour des classes");
+                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
+                scanf("%d",&Fin);}
+           }break;
+           case 3:{
+                Fin=1;
+                while(Fin){
+                system("cls");
+                system("COLOR 5B");
+                miseajourTOVCnotes(fileName);
+                affichage(fileName);
+                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
+                scanf("%d",&Fin);}
+            }break;
+           case 4:{
+                Fin=1;
+                while(Fin){
+                system("cls");
+                system("COLOR 5B");
+                suppressionTOVC(fileName);
+                affichage(fileName);
+                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
+                scanf("%d",&Fin);}
+           }break;
+           case 5:{
+                Fin=1;
+                while(Fin){
+                system("cls");
+                system("COLOR 5B");
+                printf("\narchivage");
+                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
+                scanf("%d",&Fin);}
+           }break;
+           default : {return 0;};
+    };
+    system("cls");
+    printf("\nBIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
+    printf("\n****MENU****: \n");
+    printf("\n1- Insertion d'un eleve\n");
+    printf("\n2- Mise a jour des classes\n");
+    printf("\n3- Mise a jour des notes\n");
+    printf("\n4- Suppression d'un etudiant\n");
+    printf("\n5- Archivage\n");
+    printf("\n6- Quitter\n");
+    printf("\nchoisissez une option: ");
+    scanf("%d",&CHOICE);};
 return 0;
 }
