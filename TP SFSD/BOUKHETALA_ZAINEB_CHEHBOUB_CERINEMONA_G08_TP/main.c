@@ -750,16 +750,14 @@ typedef struct adr
 
 typedef struct Tcouple  // pour l' index  dense
 {
-    float moy;
+float moy;
    int numbloc;
    int depl;
 
 
 };
 
-  struct Tcouple Index[MAXINDEX];
-
-
+struct Tcouple Index[MAXINDEX];
 
 //************************** machine abstraite TOF****************************//
 
@@ -1095,6 +1093,7 @@ char nom[TNP];
 int clenreg;
 Enreg e,e1; char fileName[256]="zed";
 chargement_initial(fileName,8);
+affichage(fileName);
 system("COLOR B4");
 int CHOICE;
 int Fin=1;
@@ -1162,6 +1161,7 @@ int FinProg=1;
            default : {return 0;};
     };
     system("cls");
+    system("COLOR B4");
     printf("\nBIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
     printf("\n****MENU****: \n");
     printf("\n1- Insertion d'un eleve\n");
