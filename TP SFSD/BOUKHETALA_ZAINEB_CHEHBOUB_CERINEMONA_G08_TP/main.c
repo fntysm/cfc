@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <time.h>
-#include <dirent.h>
-#include <stdarg.h>
 #define TailleBLC 97 // taille du bloc
 #define MAXINDEX 150
 #define b 20
@@ -51,7 +48,14 @@ typedef struct RechMan /**un enregistrement manipuler les blocs et positions dur
     int j;
     bool trouv;
 }ijtrouv;
-
+/**la machine abstraite des listes **/
+typedef char nomprenometudiant[TNP];
+typedef struct etudiantss* ptr;
+struct nomprenom /**déclaration de la liste chainée**/
+{
+    nomprenometudiant nameOfAStudent;
+    ptr next;
+};
 /**la machine abstraite**/
 
 TOVC* ouvrir(char nom[256],char mode)
@@ -468,69 +472,69 @@ ijtrouv rechercheTOVC20(char fileName[256], char cle[2], char name[TNP]){
     e.j = j;
     return e;
 }
-
+int nbrocc(int n,int list[n], int v){
+    int cpt;
+    cpt=0;
+    int k=0;
+    while (k<n){
+    if(list[k] == v){cpt++;};
+    k++;
+    };
+return cpt;
+};
 void chargement_initial(char fileName[256],int n){
-     Enreg e; ijtrouv en; int k;
+     Enreg e; ijtrouv en; int f,cpt;
      int i=1; int j=0; char chaine[256]; char cle[2]; char name[TNP];
-     srand(time(NULL));
-     e = generer_enreg();
-     generer_chaine_enreg(e,&chaine);
-     ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
-     printf("\nchaine1: %s",chaine);
-     TOVC* fh=ouvrir(fileName,'A');
-     aff_Entete(fh,1,i);
-     aff_Entete(fh,2,j);
-     fermer(fh);
-     for(k=0;k<n;k++){
-        e=generer_enreg();
+     Enreg enregistrements[n]; Enreg enregTries[n]; int s; Enreg inter;
+     int lesClefs[n]; int student; int etudiant,element,a;
+     //srand(time(NULL));
+     // générer les enregistrements aléatoirement, stocker les clés dans un tableau, les chaines
+     // d'enregistrements dans un autre
+     student=0;
+     while(student<n){
+        e = generer_enreg();
         strcpy(cle,e.classID);
         if(cle[0]=='P'){cle[0]='0';};
-        strcpy(name,e.NomPrenom);
-        printf("\nk : %d et cle : %s et nom : %s",k+1,cle,name);
-        en=rechercheTOVC(fileName,cle,name);
-        if(k==0){
-            en.trouv=true;
-        }
-    if(en.trouv){
-        printf("\n");
-    }else{
-        TOVC* fichier1=ouvrir(fileName,'A');
-        i=entete_fich(fichier1,1);
-        j=entete_fich(fichier1,2);
-        fermer(fichier1);
-    if((en.j==j)&&(en.i==i)){
-        generer_chaine_enreg(e,&chaine);
-        ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-        TOVC* fichier=ouvrir(fileName,'A');
-        aff_Entete(fichier,1,i);
-        aff_Entete(fichier,2,j);
-        aff_Entete(fichier,3,entete_fich(fichier,3)+1);
-        fermer(fichier);
-    }else{
-        en=rechercheTOVC20(fileName,cle,name);
-        int s=en.i; int r=en.j; char chaineTMP[256];
-        int s1=s; int r1=r;
-        generer_chaine_enreg(e,&chaine);
-        j=j+strlen(chaine);
-        if(j>TailleBLC){
-             j=j-TailleBLC; i++;
-                       }
-            generer_chaine_enreg(e,&chaine);
-            while((s!=i+1)&&(r!=j+1)){
-                 r=r1; s=s1;
-                 lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
-                 ecrire_chaine2(fileName,chaine,strlen(chaine),'A',&s,&r);
-                 strcpy(chaine,chaineTMP);
-                           }
-        }
-        TOVC* fichier=ouvrir(fileName,'A');
-        aff_Entete(fichier,1,i);
-        aff_Entete(fichier,2,j);
-        int e = entete_fich(fichier,3)+1;
-        aff_Entete(fichier,3,e);
-        printf("\n number of enreg : %d",entete_fich(fichier,3));
-        fermer(fichier);
+        lesClefs[student]=atoi(cle);
+        enregistrements[student]=e;
+        student++;
+     }
+         for (etudiant = 0; etudiant < n; ++etudiant)
+        {
+            for (element = etudiant + 1; element < n; ++element)
+            {
+                if (lesClefs[etudiant] > lesClefs[element])
+                {
+                    a =  lesClefs[etudiant];
+                    lesClefs[etudiant] = lesClefs[element];
+                    lesClefs[element] = a;
+                    inter = enregistrements[etudiant];
+                    enregistrements[etudiant] = enregistrements[element];
+                    enregistrements[element] = inter;
+                }
             }
+        }
+        f=0;
+        while(f<n){
+            cpt = nbrocc(n,lesClefs,lesClefs[f]);
+            for(int d=1;d<cpt;d++){
+                if(strcomp(enregistrements[f].NomPrenom,enregistrements[f+1].NomPrenom)==-1){
+                    inter = enregistrements[f];
+                    enregistrements[f] = enregistrements[f+1];
+                    enregistrements[f+1] = inter;
+                }
+                f++;
+            }
+            f++;
+        }
+     for (f = 0; f < n; ++f){
+            printf("%d et %s %s\n", lesClefs[f],enregistrements[f].classID,enregistrements[f].NomPrenom);
+    }
+     generer_chaine_enreg(enregistrements[0],&chaine);
+     ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
+     for(f=1;f<n;f++){
+     generer_chaine_enreg(enregistrements[f],&chaine);
+     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      }
      return;
     }
