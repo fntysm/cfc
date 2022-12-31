@@ -481,13 +481,12 @@ void chargement_initial(char fileName[256],int n){
      aff_Entete(fh,3,2);
      fermer(fh);
      for(int k=1;k<n;k++){
-        printf("\nk = %d",k+1);
         e=generer_enreg();
         strcpy(cle,e.classID);
         if(cle[0]=='P'){cle[0]='0';};
-        printf("\ncle : %s",cle);
+        printf("\n");
         strcpy(name,e.NomPrenom);
-        printf("\nnom : %s",name);
+        printf("\n");
         en=rechercheTOVC(fileName,cle,name);
     if(en.trouv){
         printf("\n");
@@ -507,7 +506,6 @@ void chargement_initial(char fileName[256],int n){
         fermer(fichier);
     }else{
         en=rechercheTOVC20(fileName,cle,name);
-        printf("\n where, it is supposed to exist: i : %d et j : %d",en.i,en.j);
         int s=en.i; int r=en.j; char chaineTMP[256];
         int s1=s; int r1=r;
         generer_chaine_enreg(e,&chaine);
@@ -521,7 +519,6 @@ void chargement_initial(char fileName[256],int n){
                  lire_chaine(fileName,chaineTMP,strlen(chaine),&s1,&r1);
                  ecrire_chaine2(fileName,chaine,strlen(chaine),'A',&s,&r);
                  strcpy(chaine,chaineTMP);
-                 affichage(fileName);
                            }
         }
         TOVC* fichier=ouvrir(fileName,'A');
@@ -1083,16 +1080,18 @@ void chargementIndex (int *nbe )
 
 int main()
 {
+system("COLOR B4");
 buffer buff;
 ijtrouv enregi;
 char chaine[256];
 int f=0; int c;
 char nom[TNP];
 int clenreg; int i=1; int j=0;
-Enreg e; char fileName[256]="zed";
-chargement_initial(fileName,15);
-affichage(fileName);
-/*system("COLOR B4");
+Enreg e; char fileName[256];
+printf("\nDonnez le nom du fichier que vous voulez manipuler pour qu'on puisse l'initialiser : ");
+scanf("%s",&fileName);
+/*on initialise le fichier avec 5 enregistrmeents*/
+chargement_initial(fileName,5);
 int CHOICE;
 int Fin=1;
 int FinProg=1;
@@ -1169,7 +1168,7 @@ int FinProg=1;
     printf("\n5- Archivage\n");
     printf("\n6- Quitter\n");
     printf("\nchoisissez une option: ");
-    scanf("%d",&CHOICE);};*/
+    scanf("%d",&CHOICE);};
 return 0;
 }
 
@@ -1177,27 +1176,3 @@ return 0;
 
 
 //****//
-void chargementManuel(char fileName[256],int n){
-int i=1; int j=0; char chaine[256];
-     strcpy(chaine,"447075P80BouhadiMalekMA00I00M00T00F00N00H00S00");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
-     strcpy(chaine,"451635260ChehboubKamalMA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"447317300MarradjiMonaFA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"471478420GuittoneMohamedMA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"441569450MahrezZainebFA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"436945550MahrezKarimMA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"436945550MahrezLamiaFA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     strcpy(chaine,"436945550MahrezMariaFA12I07M06T00F13N17H16S11");
-     ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
-     TOVC* fichier=ouvrir(fileName,'A');
-     aff_Entete(fichier,1,i);
-     aff_Entete(fichier,2,j);
-     aff_Entete(fichier,3,n);
-     fermer(fichier);
-}
