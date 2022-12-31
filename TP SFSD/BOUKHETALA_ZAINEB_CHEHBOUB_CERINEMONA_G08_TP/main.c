@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <dirent.h>
+#include <stdarg.h>
 #define TailleBLC 97 // taille du bloc
 #define MAXINDEX 150
 #define b 20
@@ -468,26 +470,27 @@ ijtrouv rechercheTOVC20(char fileName[256], char cle[2], char name[TNP]){
 }
 
 void chargement_initial(char fileName[256],int n){
-     Enreg e; ijtrouv en;
+     Enreg e; ijtrouv en; int k;
      int i=1; int j=0; char chaine[256]; char cle[2]; char name[TNP];
-   //  srand(time(NULL));
+     srand(time(NULL));
      e = generer_enreg();
      generer_chaine_enreg(e,&chaine);
-     printf("\n");
      ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
+     printf("\nchaine1: %s",chaine);
      TOVC* fh=ouvrir(fileName,'A');
      aff_Entete(fh,1,i);
      aff_Entete(fh,2,j);
-     aff_Entete(fh,3,2);
      fermer(fh);
-     for(int k=1;k<n;k++){
+     for(k=0;k<n;k++){
         e=generer_enreg();
         strcpy(cle,e.classID);
         if(cle[0]=='P'){cle[0]='0';};
-        printf("\n");
         strcpy(name,e.NomPrenom);
-        printf("\n");
+        printf("\nk : %d et cle : %s et nom : %s",k+1,cle,name);
         en=rechercheTOVC(fileName,cle,name);
+        if(k==0){
+            en.trouv=true;
+        }
     if(en.trouv){
         printf("\n");
     }else{
@@ -497,7 +500,6 @@ void chargement_initial(char fileName[256],int n){
         fermer(fichier1);
     if((en.j==j)&&(en.i==i)){
         generer_chaine_enreg(e,&chaine);
-        printf("\n");
         ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
         TOVC* fichier=ouvrir(fileName,'A');
         aff_Entete(fichier,1,i);
@@ -524,7 +526,9 @@ void chargement_initial(char fileName[256],int n){
         TOVC* fichier=ouvrir(fileName,'A');
         aff_Entete(fichier,1,i);
         aff_Entete(fichier,2,j);
-        aff_Entete(fichier,3,entete_fich(fichier,3)+1);
+        int e = entete_fich(fichier,3)+1;
+        aff_Entete(fichier,3,e);
+        printf("\n number of enreg : %d",entete_fich(fichier,3));
         fermer(fichier);
             }
      }
@@ -1084,15 +1088,16 @@ system("COLOR B4");
 buffer buff;
 ijtrouv enregi;
 char chaine[256];
-int f=0; int c;
-char nom[TNP];
-int clenreg; int i=1; int j=0;
+int n;
 Enreg e; char fileName[256];
 printf("\nDonnez le nom du fichier que vous voulez manipuler pour qu'on puisse l'initialiser : ");
 scanf("%s",&fileName);
 /*on initialise le fichier avec 5 enregistrmeents*/
-chargement_initial(fileName,5);
-int CHOICE;
+printf("\navec combien d'enregistrements voulez vous initialiser le fichier: ");
+scanf("%d",&n);
+chargement_initial(fileName,n);
+affichage(fileName);
+/*int CHOICE;
 int Fin=1;
 int FinProg=1;
     printf("\n                     BIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
@@ -1168,7 +1173,7 @@ int FinProg=1;
     printf("\n5- Archivage\n");
     printf("\n6- Quitter\n");
     printf("\nchoisissez une option: ");
-    scanf("%d",&CHOICE);};
+    scanf("%d",&CHOICE);};*/
 return 0;
 }
 
