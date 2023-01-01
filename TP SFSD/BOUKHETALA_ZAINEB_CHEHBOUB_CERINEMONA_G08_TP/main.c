@@ -513,22 +513,28 @@ void chargement_initial(char fileName[256],int n){
                     enregistrements[element] = inter;
                 }
             }
+
         }
         f=0;
+        for(int y=0;y<n;y++){
+            printf("\nenregistrements[]: %s",enregistrements[y].NomPrenom);
+        }
         while(f<n){
             cpt = nbrocc(n,lesClefs,lesClefs[f]);
-            for(int d=1;d<cpt;d++){
-                if(strcomp(enregistrements[f].NomPrenom,enregistrements[f+1].NomPrenom)==-1){
+            int cptsec = cpt;
+                for(int d=1;d<cpt;d++){
+                if(strcomp(enregistrements[f].NomPrenom,enregistrements[f+cptsec-1].NomPrenom)==-1){
                     inter = enregistrements[f];
-                    enregistrements[f] = enregistrements[f+1];
-                    enregistrements[f+1] = inter;
+                    enregistrements[f] = enregistrements[f+cptsec-1];
+                    enregistrements[f+cptsec-1] = inter;
                 }
+                cptsec--;
                 f++;
             }
             f++;
         }
      for (f = 0; f < n; ++f){
-            printf("%d et %s %s\n", lesClefs[f],enregistrements[f].classID,enregistrements[f].NomPrenom);
+            printf("\n%d et %s %s", lesClefs[f],enregistrements[f].classID,enregistrements[f].NomPrenom);
     }
      generer_chaine_enreg(enregistrements[0],&chaine);
      ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
