@@ -1,7 +1,11 @@
+/**la réponse aux questions théoriques est à la fin du fichier**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <dirent.h>
+#include <windows.h>
+#include <stdarg.h>
 #define TailleBLC 97 // taille du bloc
 #define MAXINDEX 150
 #define b 20
@@ -42,20 +46,13 @@ typedef struct TEnreg
     char Teff[1];
     char tabNotes[MatMax];
 }   Enreg;
-typedef struct RechMan /**un enregistrement manipuler les blocs et positions durant la recherche**/
+typedef struct RechMan /**un enregistrement pour manipuler les blocs et positions durant la recherche**/
 {
     int i;
     int j;
     bool trouv;
 }ijtrouv;
-/**la machine abstraite des listes **/
-typedef char nomprenometudiant[TNP];
-typedef struct etudiantss* ptr;
-struct nomprenom /**déclaration de la liste chainée**/
-{
-    nomprenometudiant nameOfAStudent;
-    ptr next;
-};
+
 /**la machine abstraite**/
 
 TOVC* ouvrir(char nom[256],char mode)
@@ -131,6 +128,7 @@ int alloc_Tbloc(TOVC *f)
 /**fin de machine abstraite**/
 
 /**fonctions qu'on utilise presque partout**/
+
 /**ecrire chaine**/
 void ecrire_chaine(char name[256], char chaine[256], int longu, char mode, int *s, int *r){
      int i = *s;
@@ -226,7 +224,7 @@ void lire_chaine(char name[256], char chaine[256], int longu, int *s, int *r)
     *r = j;
     fermer(f);
 }
-/**une fonction pour afficher le fichier TOVC**/
+/**une fonction pour afficher le fichier TOVC (bloc par bloc)**/
 void affichage(char nom[256])
   {
    int i=1; int j=0; buffer buf; int stop=0;
@@ -249,6 +247,7 @@ void affichage(char nom[256])
      fermer(f);
   }
 /**fonctions relatives à l'énoncé du TP**/
+
 /**pour lire une ligne spécifique d'un fichier texte (pour choisir aléatoirement les noms et prénoms)**/
 void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     FILE *fH;
@@ -264,6 +263,7 @@ void readLine(char fileName[MAX/2], int lineNum, char buffer[MAX]){
     };
     fclose(fH);
 }
+
 /**une fonction pour génerer un enregistrement selon les critéres de l'énoncé du TP**/
 Enreg generer_enreg(){
     Enreg e;
@@ -273,7 +273,7 @@ Enreg generer_enreg(){
     char prenoms[MAX]; char studentIDchar[4]; int tabnotes[MatMax]; int note;
     char tabnotesChar[MatMax];
     char noteChar[MatMax]; int a=0; const char s[2] = ",";char *token;
-            studentID = 1000 + rand() % 10000;
+            studentID = 1000 + rand() % 8800;
             sprintf(studentIDchar,"%d", studentID);
             strcpy(e.numID,studentIDchar);
             salle = rand() % 10;
@@ -370,7 +370,7 @@ void foncman(int n,int *i,int *j){
 ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
     ijtrouv e;
     int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
-    TOVC* f=ouvrir(fileName,'A');
+    TOVC* f=ouvrir(fileName,'A'); int c1,c2;
     int dernierbloc=entete_fich(f,1);
     int dernierepos=entete_fich(f,2);
     fermer(f);
@@ -399,19 +399,22 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
                     }else{
                         if(strcomp(name,Nomprenom)==1){
                             stop=true;
+                        }else{
+                       i=s; j=r;
+                       manfonc(atoi(longueur)+2,&i,&j);
                         }
                     }
             }else{
-                int c1=atoi(clenreg);
-                int c2=atoi(cle);
+                c1=atoi(clenreg);
+                c2=atoi(cle);
                 if(c1>c2){stop=true;}
                 if(c1<c2){
             i=s; j=r;
             manfonc(atoi(longueur)+2,&i,&j);
             if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
             }
-            }
-        }
+
+        }}
     i=s; j=r;
     manfonc(atoi(longueur)+2,&i,&j);
     e.trouv = trouv;
@@ -424,7 +427,7 @@ ijtrouv rechercheTOVC(char fileName[256], char cle[2], char name[TNP]){
 ijtrouv rechercheTOVC20(char fileName[256], char cle[2], char name[TNP]){
     ijtrouv e;
     int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
-    TOVC* f=ouvrir(fileName,'A');
+    TOVC* f=ouvrir(fileName,'A'); int c1,c2;
     int dernierbloc=entete_fich(f,1);
     int dernierepos=entete_fich(f,2);
     fermer(f);
@@ -453,25 +456,29 @@ ijtrouv rechercheTOVC20(char fileName[256], char cle[2], char name[TNP]){
                     }else{
                         if(strcomp(name,Nomprenom)==1){
                             stop=true;
+                        }else{
+                       i=s; j=r;
+                       manfonc(atoi(longueur)+2,&i,&j);
                         }
                     }
             }else{
-                int c1=atoi(clenreg);
-                int c2=atoi(cle);
+                c1=atoi(clenreg);
+                c2=atoi(cle);
                 if(c1>c2){stop=true;}
                 if(c1<c2){
             i=s; j=r;
             manfonc(atoi(longueur)+2,&i,&j);
             if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
             }
-            }
-        }
+
+        }}
     i=s; j=r;
     e.trouv = trouv;
     e.i = i;
     e.j = j;
     return e;
 }
+/**une fonctions qui calcule le nombre d'occurences d'un élément d'un tableau**/
 int nbrocc(int n,int list[n], int v){
     int cpt;
     cpt=0;
@@ -483,13 +490,11 @@ int nbrocc(int n,int list[n], int v){
 return cpt;
 };
 void chargement_initial(char fileName[256],int n){
-     Enreg e; ijtrouv en; int f,cpt;
-     int i=1; int j=0; char chaine[256]; char cle[2]; char name[TNP];
+     Enreg e; ijtrouv en; int f,cpt,cptsec;
+     int i; int j; char chaine[256]; char cle[2]; char name[TNP];
      Enreg enregistrements[n]; Enreg enregTries[n]; int s; Enreg inter;
      int lesClefs[n]; int student; int etudiant,element,a;
-     //srand(time(NULL));
-     // générer les enregistrements aléatoirement, stocker les clés dans un tableau, les chaines
-     // d'enregistrements dans un autre
+     srand(time(NULL));
      student=0;
      while(student<n){
         e = generer_enreg();
@@ -516,32 +521,45 @@ void chargement_initial(char fileName[256],int n){
 
         }
         f=0;
-        for(int y=0;y<n;y++){
-            printf("\nenregistrements[]: %s",enregistrements[y].NomPrenom);
-        }
         while(f<n){
             cpt = nbrocc(n,lesClefs,lesClefs[f]);
-            int cptsec = cpt;
-                for(int d=1;d<cpt;d++){
-                if(strcomp(enregistrements[f].NomPrenom,enregistrements[f+cptsec-1].NomPrenom)==-1){
-                    inter = enregistrements[f];
-                    enregistrements[f] = enregistrements[f+cptsec-1];
-                    enregistrements[f+cptsec-1] = inter;
+            if(cpt>1){
+                for(cptsec=0;cptsec<cpt;cptsec++){
+                    enregTries[cptsec]=enregistrements[f+cptsec];
                 }
-                cptsec--;
-                f++;
+                for (i = 0; i < cpt; ++i)
+                {
+                for (j = i + 1; j < cpt; ++j)
+                {
+
+                if (strcomp(enregTries[i].NomPrenom,enregTries[j].NomPrenom)==-1)
+                {
+
+                    inter =  enregTries[i];
+                    enregTries[i] = enregTries[j];
+                    enregTries[j] = inter;
+
+                }
+               }
+               }
+               for(cptsec=0;cptsec<cpt;cptsec++){
+                    enregistrements[f+cptsec]=enregTries[cptsec];
+                }
             }
-            f++;
+            f=f+cpt;
         }
-     for (f = 0; f < n; ++f){
-            printf("\n%d et %s %s", lesClefs[f],enregistrements[f].classID,enregistrements[f].NomPrenom);
-    }
+     i=1; j=0;
      generer_chaine_enreg(enregistrements[0],&chaine);
      ecrire_chaine(fileName,chaine,strlen(chaine),'N',&i,&j);
      for(f=1;f<n;f++){
      generer_chaine_enreg(enregistrements[f],&chaine);
      ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
      }
+     TOVC* fichier=ouvrir(fileName,'A');
+     aff_Entete(fichier,1,i);
+     aff_Entete(fichier,2,j);
+     aff_Entete(fichier,3,n);
+     fermer(fichier);
      return;
     }
 
@@ -571,19 +589,25 @@ if(clee<10){
 }
 en=rechercheTOVC(fileName,cle,nom);
     if(en.trouv){
-        printf("\netudiant deja insere son i : %d et son j : %d",en.i,en.j);
+        printf("\netudiant deja insere");
         return;
     }else{
-    printf("\nnon insere\n");
     strcpy(e.classID,cle);
     if(clee<10){
     e.classID[0]='P';
       }
     strcpy(e.Teff,"0");
     strcpy(e.NomPrenom,nom);
+    int identifiant;
+    identifiant = 1000 + rand()% 8000;
+    sprintf(e.numID,"%d",identifiant);
     printf("\nle genre: "); scanf("%s",&e.genre);
-    printf("\nle tableau des notes: A20I20M20T20F20N20H20S20: "); scanf("%s",&e.tabNotes);
-    printf("\nle id:"); scanf("%s",&e.numID);
+    if(e.classID[0]!='P'){
+                int noteligne = 1 + rand() % 84;
+                readLine("notes.txt",noteligne,e.tabNotes);
+            }else{
+                strcpy(e.tabNotes,"A00I00M00T00F00N00H00S00");
+                 }
     l = strlen(e.NomPrenom)+strlen(e.tabNotes)+4+2+1+1;
     sprintf(longueur,"%d", l);
     strcpy(e.longEnreg,longueur);
@@ -592,7 +616,6 @@ en=rechercheTOVC(fileName,cle,nom);
         ecrire_chaine(fileName,chaine,strlen(chaine),'A',&i,&j);
     }else{
         en=rechercheTOVC20(fileName,cle,nom);
-        printf("\n\non a i : %d et j : %d ou devait s'inserer cet etudiant",en.i,en.j);
         int s=en.i; int r=en.j; char chaineTMP[256];
         int s1=s; int r1=r;
         j=j+strlen(chaine);
@@ -631,11 +654,9 @@ if(clee<10){
 }
 en=rechercheTOVC(filename,cle,nom);
     if (en.trouv){
-            printf("\ntrouv: i : %d et j : %d",en.i,en.j);
             i=en.i; j=en.j;
             n=26+strlen(nom);
             foncman(n,&i,&j);
-            printf("\ntrouv: n : %d",n);
             strcpy(eff,"1"); ecrire_chaine(filename,eff,1,'A',&i,&j);
 }
     else {printf("\netudiant n existe pas");}
@@ -650,7 +671,7 @@ en=rechercheTOVC(filename,cle,nom);
 void miseajourTOVCnotes(char fileName[256]){
 char nom[TNP]; int clenreg; char cle[2]; char clef[2]; ijtrouv en; int n; bool stop=false; char note[2];
 printf("\nBienvenue dans la procedure de la mise a jour:\n"); char choice;
-printf("\nveuillez inserer successivement l'annee de scolarisation (0 pour Preparatoire) et la salle (de 0 a 9 ) ie: 09 ou 53 : ");
+printf("\nveuillez inserer successivement l'annee de scolarisation (0 pour Preparatoire) et la salle (de 0 a 9 ) parexemple: 09 ou 53 : ");
 scanf("%d",&clenreg);
 printf("veuillez inserer le nom et le prenom de l'eleve : ");
 scanf("%s", &nom);
@@ -709,6 +730,8 @@ if(en.trouv){
 }
 }
 /**les fonctions de la partie 02**/
+
+
 typedef struct EnteteTOF
 {
     int nbBloc;
@@ -754,11 +777,11 @@ typedef struct Tcouple  // pour l' index  dense
 
 };
 
-  struct Tcouple Index[MAXINDEX];
+struct Tcouple Index[MAXINDEX];
 
 
 
-//************************** machine abstraite TOF****************************//
+/************************** machine abstraite TOF****************************/
 
 
 int enteteTOF(TOF *f, int i)
@@ -838,49 +861,42 @@ void allocBlocTOF(TOF *f)
 }
 
 
+/**fonctions principales de la partie 2**/
 
 
-
-
-float returnmax (TBlocTOF buf)
-
-{ float max; int m=1; int t;
-max=buf.tab[0].moy;
+/**elle retourne la moyenne maximum dans un buffer**/
+float returnmax (TBlocTOF buf){
+    float max; int m=1; int t;
+    max=buf.tab[0].moy;
 for (t=0;t<20;t++){
 
     if (max < buf.tab[m].moy){max =buf.tab[m].moy; m++;}
     else {m++;}
 
 }
-
-
      return max;
 }
 
-
-float returnmin (TBlocTOF buf)
-
-{
-float min; float h; int t,m=0;
-min=buf.tab[0].moy;
+/**elle retourne la moyenne minimum dans un buffer**/
+float returnmin (TBlocTOF buf){
+       float min; float h; int t,m=0;
+       min=buf.tab[0].moy;
 for (t=0;t<20;t++){
 
     if (min >= buf.tab[m].moy){min =buf.tab[m].moy; m++; }
     else {m++;}
 
-} h=min;
+                  }
+h=min;
 
      return h;
 }
 
-
-
-
-void ordonnerTableau(struct Tcouple tableau[MAXINDEX], int tailleTableau) //fonction qui ordonne un tableau ordre croissant
+/**fonction qui ordonne un tableau ordre croissant**/
+void ordonnerTableau(struct Tcouple tableau[MAXINDEX], int tailleTableau)
 {
 int i,t,k=0;
 struct Tcouple tmp;
-
 for(t =0 ; t < tailleTableau; t++)
 {
 for(i=t+1; i < tailleTableau ; i++)
@@ -895,26 +911,23 @@ if(tableau[t].moy > tableau[i].moy)
 }
 }
 }
-
 }
 
 
-
-void chargementIndex (int *nbe )
+/**chargement de l'index**/
+void chargementIndex (char fileName[256],int *nbe )
 {
   TBlocTOF buf;
   struct Tcouple Index[MAXINDEX];
-   struct e {
-        char nom[20];
-        int year;
-        float moy;
-
+  struct e {
+  char nom[20];
+  int year;
+  float moy;
     } ; //structure enreg fichier
 
     FILE *f = NULL; bool trouv=false;
     int k; int i=0; int j=0; float val=0;
     char name[20]; int y; float moy; int m;
-
 
     char nomf[30];
     printf( "\nConstruction d un fichier TOF \n\n");
@@ -927,16 +940,9 @@ void chargementIndex (int *nbe )
         printf( "erreur lors de l ouverture du fichier %s en mode wb\n", nomf );
         return 0;
     }
-     char* tab1[MAXINDEX] = {"ABDELAZIZCHAIMA" ,"ABDELKBIRACHRAF","ABOUDIBRAHIM","AINOICHEMELISSA" , "AITSIAMERSARA","AKLIRAYANE","ALIOUCHEMELISSA","ALLOUCHEIMEN","AMIRATTHANINA","AOUFARFARES","ARABHAMZA",
-     "ARROUDJILHEM", "BABOUNEBOUCHRA","BAHAMIDYASMINE","BAZOULACERINE","BELGACEMROZA","BELHARDAAYA","BELLILIRANIA","BENALIMAROUA","BENAMEURTAREK","BENMACHICHKHALED","BLIDILYES","BOUAZIZKENZA","BOUDIAFFADIA","BOUHADIHAIFA", //25
-     "BOUKHETALAZAINEB","BOUNABCHAIMA","BOUYAHIAOUIMERIEM","BROUTHENKAMEL","CHALLALRIAD","CHEHBOUBCERINE","CHELLIAMINA","CHEREFWASSIM","CHOUIDERIKRAM","DABOUZMOH","DAHMANIAMIRA","DELILIHIND","DERBALRAYAN","DJEDJIBNADA", //39
-     "DOUIBIWASSIM","ELABEDAMINA","FADELNESRINE","FELLAHMAHDI","GHODBANEZINEB","GUEDDAZOLA","GUEDDOUCHERANIA", //46
-     "GUFAIFIARANIA","GITOUNDJIHENE","HADDADAMIRA","HAFISMELISSA","HAMADENEKAMELIA","HAMEDHIBA","HAMZAOUIBESMA","HERKATWIFAK","HIMRANNEHLA", //55
-     "KADRILYNA","KAROUYASMINE","KASMIAYOUB","KETFIHIBET","KHADIRAMINA","KORZANEYASSER","LOUARBOUTHEYNA","LAOUZAILINA","LOUINIIMENE","MALLEKDINA","MAMERIFARES", //66
-     "MAMOUNIMAHDI","MEDERBELINES","MEGDADIMED","MELZIMOUNIR","MEROUANEMERIEM","MOUGARIAYMEN","MOUMNACHARAF","NAKIBIBTIHEL","NOUALIASMA",
-     "OUANESSAMY","OUCHENEHIBET","OURBIAHCHIRAZ","RABIAABLA","RADJIMARIA","REMIDIIMED","REZIGHAMZA","RIALAYA","SAIDIASMA","SEDDIKIWASSIM","SERIRRANIA","SOUFILOUAI","TOUILIMANE","YAZILYNDA","YEKENESOFIANE","YOUSFISARAH","ZAIDIYASMINE",
-     "ZEROUALMOHAMED","ZOUBIRMOHAMED","ZOUTATMARWA"}; //95
 
+
+    /** les notes des eleves **/
 
      float tab2[MAXINDEX] = {17,16.32,19,15.02,14.06,15,18,17,13.05,12.07,16.08,13.4,14.7,10.03,11.5,11.2,19.05,19.56,17.8,11.68,18.23,15.42,16.1,12.63,13.81,12.54,16.87,17.36,14,18,
      10.24,13.89,10.05,11.56,11.48,19.22,15.41,10.36,11.49,11.75,13.47,14.25,19.45,17.12,17.26,10.17,10.69,10.54,10,11,12,13,14,16,14,10.2,11.4,13.04,17.05,15.47,12.3,18.13,17,16.32,19,15.02,14.06,15,18,17,13.05,12.07,16.08,13.4,14.7,10.03,11.5,11.2,19.05,19.56,17.8,11.68,18.23,15.42,16.1,12.63,13.81,12.54,16.87,17.36,14,18,
@@ -944,9 +950,8 @@ void chargementIndex (int *nbe )
      10.24,13.89,10.05,11.56,11.48,19.22,15.41,10.36,11.49,11.75,13.47,14.25,19.45,17.12,17.26,10.17,10.69,10.54,10,11,12,13,14,16,14,10.2,11.4,13.04,17.05,15.47,12.3,18.13};
 
      printf(" \n -------------------Affichage du fichier archive------------------\n  ");
-     printf("\n numEtudiant | nomprenom  | annee de scolarisation  | moyenne \n ");
+     printf("\n numEtudiant |\tnomprenom  |\tannee de scolarisation  | moyenne \n ");
      srand(time(NULL));
-
 
      for (k=0;k<nbe;k++) //nombre d'enreg
      {
@@ -954,37 +959,33 @@ void chargementIndex (int *nbe )
          if (j<b)
         {
 
-         strcpy(buf.tab[j].nom,tab1[k]);
-         buf.tab[j].year = ((rand () % 5) +1);
-         buf.tab[j].moy= tab2[k];
+        readLine("nomsArchive.txt",k,buf.tab[j].nom);
+        buf.tab[j].year = ((rand () % 5) +1);
+        buf.tab[j].moy= tab2[k];
 
 
-         printf("| %d | nom %s  |annee %d | moy %.2f \n ",k,buf.tab[j].nom,buf.tab[j].year,buf.tab[j].moy);
+         printf("| %d |\tnom %s  |\tannee %d | moy %.2f \n ",k,buf.tab[j].nom,buf.tab[j].year,buf.tab[j].moy);
          j++; buf.nb++;
 
          }
          else
          {
-
-
+             /** a la fin on parcours le buffer pour la moyenne max et min**/
              buf.max=returnmax(buf);
              buf.min=returnmin(buf);
-             printf(" valeur max et min %.2f %.2f \n ",buf.max,buf.min);
-
+             printf("\nvaleur max et min du Buffer %.2f %.2f \n ",buf.max,buf.min);
              ecrireDirTOF(f,i,&buf); i++; j=1;
              srand(time(NULL));
-         strcpy(buf.tab[0].nom,tab1[k]);
-         buf.tab[0].year = (rand () % 5) +1;
-         buf.tab[0].moy= tab2[k];
-                  printf("| %d | nom %s  | year %d | moy %.2f \n ",k,buf.tab[0].nom,buf.tab[0].year,buf.tab[0].moy);
-
-
+             readLine("nomsArchive.txt",k,buf.tab[j].nom);
+             buf.tab[0].year = (rand () % 5) +1;
+             buf.tab[0].moy= tab2[k];
+             printf("| %d |\tnom %s  |\tyear %d |\tmoy %.2f \n ",k,buf.tab[0].nom,buf.tab[0].year,buf.tab[0].moy);
          }
 
      }
 
     affEnteteTOF(f,1,i+1); affEnteteTOF(f,2,k);
-    printf(" il y a %d blocs et %d enregistrements \n",enteteTOF(f,1), enteteTOF(f,2));
+    printf("\nil y a %d blocs et %d enregistrements \n",enteteTOF(f,1), enteteTOF(f,2));
 
 
    k=0; i=0; j=0;
@@ -1014,32 +1015,35 @@ void chargementIndex (int *nbe )
   // on va ordonner les valeurs de l'index
   ordonnerTableau(&Index,nbe);
   //affichage de l'index ordonné
-  printf("\n ");
-  printf(" \n Affichage de l'index en ordre" );
+  printf("\n");
+  printf("\nAffichage de l'index en ordre" );
   for (k=0;k<nbe;k++)
   {
-     printf("\n %d | moyenne %.2f <i,j> = <%d,%d >",k,Index[k].moy,Index[k].numbloc,Index[k].depl);
+     printf("\n %d | moyenne %.2f <i,j> = <%d,%d >\n",k,Index[k].moy,Index[k].numbloc,Index[k].depl);
 
   }
 
-       Recherche_Index(&Index,nbe,&tab1);
+       Recherche_Index(&Index,nbe);
 
 
 }
- Recherche_Index (struct Tcouple tab[MAXINDEX], int tailleTableau,char* T[MAXINDEX] )
+ void Recherche_Index (struct Tcouple tab[MAXINDEX], int tailleTableau )
  {
-    int m=0; int k=0; int cpt=0;float val=0;
+    int m=0; int k=0; int cpt=0;float val=0; char etudiant[50];
     printf(" \n Procedure Recherche ");
     printf("\n donnez la moyennne  "); scanf("%f",&val);
     printf(" \n les etudiants qui ont une moyenne superieur/egale a %2.f ",val);
 
    for (k=0;k<tailleTableau;k++){
-    if (val<tab[k].moy || val==tab[k].moy){ cpt++;printf("\n %s",T[k]); printf(" <%d,%d> ",tab[k].numbloc,tab[k].depl);
+    if (val<tab[k].moy || val==tab[k].moy){ cpt++; readLine("nomsArchive.txt",k,etudiant);
+    printf("\n %s",etudiant); printf(" <%d,%d> ",tab[k].numbloc,tab[k].depl);
 
     } }
     if (cpt==0){printf(" \n la moyenne %.2f n'existe pas",val);}
 
  }
+
+
 
 
  /*Insertion_eleve(char *filename, TOF *f,struct e student)
@@ -1090,11 +1094,158 @@ void chargementIndex (int *nbe )
         affEnteteTOF(f,2,enteteTOF(f,2)+1);
  }*/
 
+void affichageStruct(char fileName[256]){
+    ijtrouv e;
+    int i=1; int j=0; bool stop=false; bool trouv=false; int s,r;
+    TOVC* f=ouvrir(fileName,'A'); int c1,c2;
+    int dernierbloc=entete_fich(f,1);
+    int dernierepos=entete_fich(f,2);
+    fermer(f);
+    char *clenreg=malloc(sizeof(char)*2); //taille de classeID
+    char *longueur=malloc(sizeof(char)*2);
+    char *Nomprenom=malloc(sizeof(char)*TNP);
+    char *identifiant=malloc(sizeof(char)*4);
+    char *Teff=malloc(sizeof(char)*1);
+    while(!stop)
+        {
+            s=i; r=j;
+            lire_chaine(fileName,longueur,2,&i,&j);
+            lire_chaine(fileName,identifiant,4,&i,&j);
+            lire_chaine(fileName,clenreg,2,&i,&j);
+            printf("\ncle : %s",clenreg);
+            lire_chaine(fileName,Teff,1,&i,&j);
+            lire_chaine(fileName,Nomprenom,atoi(longueur)-24-1-2-4-1,&i,&j);
+            printf("\nID : %s nomprenom : %s",identifiant,Nomprenom);
+            if(strcomp(Teff,"1")==0){printf("\nNe Poursuit pas ses etudes actuellement a notre ecole (supprimee logiquement)");}
+            i=s; j=r;
+            manfonc(atoi(longueur)+2,&i,&j);
+            if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
+            printf("\n------------------------");
+        }
+
+}
+void affichageNotes(char fileName[256]){
+    ijtrouv e;
+    int i=1; int j=0; bool stop=false; bool trouv=false; int s,r,a,aa;
+    TOVC* f=ouvrir(fileName,'A'); int c1,c2;
+    int dernierbloc=entete_fich(f,1);
+    int dernierepos=entete_fich(f,2);
+    fermer(f);
+    char *clenreg=malloc(sizeof(char)*2); //taille de classeID
+    char *longueur=malloc(sizeof(char)*2);
+    char *Nomprenom=malloc(sizeof(char)*TNP);
+    char *Teff=malloc(sizeof(char)*1);
+    char *TABLEAUNOTES=malloc(sizeof(char)*25);
+    char *gender=malloc(sizeof(char)*1);
+    while(!stop)
+        {
+            s=i; r=j;
+            lire_chaine(fileName,longueur,2,&i,&j);
+            manfonc(4,&i,&j);
+            lire_chaine(fileName,clenreg,2,&i,&j);
+            printf("\ncle : %s",clenreg);
+            lire_chaine(fileName,Teff,1,&i,&j);
+            lire_chaine(fileName,Nomprenom,atoi(longueur)-24-1-2-4-1,&i,&j);
+            lire_chaine(fileName,gender,1,&i,&j);
+            printf("\nnomprenom : %s",Nomprenom);
+            if(strcomp(Teff,"1")==0){printf("\nNe Poursuit pas ses etudes actuellement a notre ecole (supprimee logiquement)");
+            }else{
+                lire_chaine(fileName,TABLEAUNOTES,24,&i,&j);
+                a=0;
+                printf("\nLES NOTES DES EXAMENS DE CE TRIMESTRE\n");
+                while(a<24){
+                   switch(a){
+                    case 0:{printf("\nla note de l'examen de la langue arabe : ");}break;
+                    case 3:{printf("\nla note de l'examen de l'education islamique : ");}break;
+                    case 6:{printf("\nla note de l'examen des mathematiques : ");}break;
+                    case 9:{printf("\nla note de l'examen de la langue berbere : ");}break;
+                    case 12:{printf("\nla note de l'examen du francais : ");}break;
+                    case 15:{printf("\nla note de l'examen de l'anglais : ");}break;
+                    case 18:{printf("\nla note de l'examen de l'histoire/geo: ");}break;
+                    case 21:{printf("\nla note de l'examen du sport : ");}break;
+                }
+                a++;
+                    for(int aa=0;aa<2;aa++){
+                        printf("%c",TABLEAUNOTES[a]);
+                        a++;
+                    }
+                }
+
+
+            }
+            i=s; j=r;
+            manfonc(atoi(longueur)+2,&i,&j);
+            if((i==dernierbloc)&&(!trouv)&&(j==dernierepos)){stop=true;}
+            printf("\n------------------------");
+        }
+
+}
+
+void home()
+{
+
+    printf("\n\n\n\n");
+    printf("\t\t\t\t __| |________________________________________________________________________________________________________________| |__\n\t\t\t\t");
+    printf("(__   ________________________________________________________________________________________________________________   __)\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("          ___  ___ _                                                                                            ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |");
+    printf("         / _ \\/ __| |                                                                                           ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |");
+    printf("        |  __/\\__ \\ |                 Ecole Nationale Superieure d'informatique   (ex INI)                      ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |");
+    printf("         \\___||___/_|                 Cycle preparatoire integre (2CPI)                                         ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("        Travail Pratique :");
+    printf("  : Gestion de la scolarite                          ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("        Realise par :");
+    printf("     Boukhetala Zaineb   Chehboub Cerine Mona                                                    ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |");
+    printf("                                 section C Groupe 08                                                            ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("        Encadre par :");
+    printf(" Mme. ARTABAZ Saliha                                                                           ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("        Version :  ");
+    printf("| |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    printf("   | |");
+    printf("                              APPUYER SUR LA TOUCHE ENTREE POUR CONTINUER                                       ");
+    printf("| |\n\t\t\t\t");
+    printf(" __| |_______________________________________________________________________________________________________________ | |__\n\t\t\t\t");
+    printf("(__   ________________________________________________________________________________________________________________   __)\n\t\t\t\t");
+    printf("   | |                                                                                                                | |\n\t\t\t\t");
+    getch();
+}
 
 
 int main()
 {
-system("COLOR B4");
+system("COLOR F9");
+home();
 buffer buff;
 ijtrouv enregi;
 char chaine[256];
@@ -1102,18 +1253,17 @@ int n;
 Enreg e; char fileName[256];
 printf("\nDonnez le nom du fichier que vous voulez manipuler pour qu'on puisse l'initialiser : ");
 scanf("%s",&fileName);
-/*on initialise le fichier avec 5 enregistrmeents*/
 printf("\navec combien d'enregistrements voulez vous initialiser le fichier: ");
 scanf("%d",&n);
 chargement_initial(fileName,n);
-affichage(fileName);
-/*int CHOICE;
+system("cls");
+int CHOICE;
 int Fin=1;
 int FinProg=1;
-    printf("\n                     BIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
+    printf("\n\t\t\tBIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
     printf("\n                                                     ****MENU****: \n");
     printf("\n1- Insertion d'un eleve\n");
-    printf("\n2- Mise a jour des classes\n");
+    printf("\n2- Affichage de la liste des eleves\n");
     printf("\n3- Mise a jour des notes\n");
     printf("\n4- Suppression d'un etudiant\n");
     printf("\n5- Archivage\n");
@@ -1125,29 +1275,34 @@ int FinProg=1;
                 Fin=1;
                 while(Fin){
                 system("cls");
-                system("COLOR 5B");
+                system("COLOR F9");
                 insertionTOVC(fileName);
-                affichage(fileName);
-                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
-                scanf("%d",&Fin);}
+                affichageStruct(fileName);
+                Fin=0;}
                 system("pause");
            }break;
            case 2:{
                 Fin=1;
                 while(Fin){
-                system("COLOR 5B");
+                system("COLOR F9");
                 system("cls");
-                printf("\nmise a jour des classes");
-                printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
-                scanf("%d",&Fin);}
+                int affich;
+                printf("\nvoulez vous l'affichage avec les notes (1) ou pas (simple, juste la cle et le nom: 0): ");
+                scanf("%d",&affich);
+                switch(affich){
+                    case 0:{affichageStruct(fileName);}break;
+                    case 1:{affichageNotes(fileName);}break;
+                }
+                Fin=0;}
+                system("pause");
            }break;
            case 3:{
                 Fin=1;
                 while(Fin){
                 system("cls");
-                system("COLOR 5B");
+                system("COLOR F9");
                 miseajourTOVCnotes(fileName);
-                affichage(fileName);
+                affichageNotes(fileName);
                 printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
                 scanf("%d",&Fin);}
             }break;
@@ -1155,9 +1310,9 @@ int FinProg=1;
                 Fin=1;
                 while(Fin){
                 system("cls");
-                system("COLOR 5B");
+                system("COLOR F9");
                 suppressionTOVC(fileName);
-                affichage(fileName);
+                affichageStruct(fileName);
                 printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
                 scanf("%d",&Fin);}
            }break;
@@ -1165,29 +1320,55 @@ int FinProg=1;
                 Fin=1;
                 while(Fin){
                 system("cls");
-                system("COLOR 5B");
-                chargementIndex(95);
+                system("COLOR F9");
+                chargementIndex(fileName,n);
                 printf("\nVoulez-vous continuer l operation? (Taper 1 pour continuer et 0 pour retourner au menu) : ");
                 scanf("%d",&Fin);}
            }break;
            default : {return 0;};
     };
     system("cls");
-    system("COLOR B4");
+    system("COLOR F9");
     printf("\nBIENVENUE DANS LA PLATEFORME DE MANIPULATION DES FICHIERS DE NOTRE ECOLE PRIMAIRE\n");
     printf("\n****MENU****: \n");
     printf("\n1- Insertion d'un eleve\n");
-    printf("\n2- Mise a jour des classes\n");
+    printf("\n2- Affichage des eleves et leur notes\n");
     printf("\n3- Mise a jour des notes\n");
     printf("\n4- Suppression d'un etudiant\n");
     printf("\n5- Archivage\n");
     printf("\n6- Quitter\n");
     printf("\nchoisissez une option: ");
-    scanf("%d",&CHOICE);};*/
+    scanf("%d",&CHOICE);};
 return 0;
 }
 
+/**
+Répondre au questions théoriques:
+QUESTION:
 
+Comment devez vous procéder pour construire un fichier de dossiers scolaires par
+élève comprenant les années de scolarisation par élève et la moyenne de passage.
+Quelle sera la clé ? quel type du modèle allez vous choisir ?
+REPONSE:
+
+la clé de l'index: la moyenne
+modèle: TOF
+
+QUESTION:
+Quel type d’index choisir ?
+
+REPONSE:
+index dense
+
+QUESTION:
+Quel est le coût de l’archivage?
+
+REPONSE:
+le meilleur cas et le pire des cas, dépend de n (le nombre d'enregistrements dans le fichier
+TOF (TOVC ARCHIVEE)
+donc n*liredir()+n*ecriredir()
+
+**/
 
 
 //****//
