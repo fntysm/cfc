@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <dirent.h>
-#include <windows.h>
-#include <stdarg.h>
 #define TailleBLC 97 // taille du bloc
 #define MAXINDEX 150
 #define b 20
