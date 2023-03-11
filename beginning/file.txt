@@ -1,7 +1,0 @@
-prologue
-browser
-manipulation
-notion
-a string of words
-anyone
-epilogue

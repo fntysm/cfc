@@ -1,7 +1,0 @@
-prologue
-browser
-manipulation
-days
-a string of words
-anyone
-epilogue
